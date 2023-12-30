@@ -1,0 +1,12 @@
+.header-container {
+    background-color: var(--headerColour);
+    /* min-height: 100vh; */
+    min-height: var(--headerHeight);
+    max-height: var(--headerHeight);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }

@@ -1,0 +1,119 @@
+/* .contextMenuSlideContainer {
+    /* margin: 200px;
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+} */
+
+.contextMenu {
+    position: absolute;
+    height: 150px;
+    width: 200px;
+    background-color: var(--headerColour);
+    color: white;
+}
+
+.contextMenuOptions {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    /* box-sizing: border-box; */
+    /* padding: 10px; */
+    /* margin: 0;
+    list-style: none; */
+}
+
+.contextOption {
+    position: relative;
+    flex: 1;
+    margin: 8px 12px;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: all 0.6s ease-in-out;
+}
+
+.contextOption.deselected {
+    flex: 0;
+}
+
+/* .addTopicDisplay .contextOption.addTopic {
+    background-color: red;
+} */
+
+/* .addTopicDisplay .contextOption.removeTopic {
+    display: none;
+    visibility: hidden;
+    transition: all 0.6s ease-in-out
+} */
+
+.contextOption:hover {
+    cursor: pointer;
+    background-color: black;
+}
+
+.contextOption .titleContent{
+    /* box-shadow: 1px 1px 3px rgba(0,0,0,0.3) inset; */
+    /* color: #000; */
+    height: 100%;
+    /* background: #fdc424; */
+    transition: left 0.4 ease;
+}
+
+.contextOption .optionContent{
+    background: rgba(0,0,0,0.5);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: all 0.6s ease;
+    top: -400%;
+}
+
+.contextOption.selected .optionContent {
+top: 0%;
+}
+
+.contextMenuAddTopic {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-evenly;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.contextMenuAddTopic .inputField input {
+    width: 100%;
+    font-size: 15px;
+    border-radius: 20px;
+    background-color: var(--headerColour);
+    border-color: var(--headerColour);
+    color: white;
+}
+
+.contextMenuAddTopic .buttonField {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    border-color: var(--headerColour);
+}
+
+.contextMenuAddTopic .buttonField button {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 20%;
+    height: 80px;
+    border-radius: 20px;
+    background-color: var(--headerColour);
+    border-color: var(--headerColour);
+    color: white;
+    font-size: 16px;
+    margin: 20px;
+}

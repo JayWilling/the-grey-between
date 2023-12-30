@@ -1,0 +1,15 @@
+.treeMenu {
+    padding-left: 20px;
+}
+
+.treeMenu .item {
+    display: flex;
+}
+
+.treeMenu .text {
+    width: 100%;
+}
+
+.expandBtn {
+    z-index: 3;
+}
