@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/the-grey-between/static/css/main.b561236f.css",
+    "main.js": "/the-grey-between/static/js/main.b0bbfa4c.js",
+    "static/js/787.9d439297.chunk.js": "/the-grey-between/static/js/787.9d439297.chunk.js",
+    "index.html": "/the-grey-between/index.html",
+    "main.b561236f.css.map": "/the-grey-between/static/css/main.b561236f.css.map",
+    "main.b0bbfa4c.js.map": "/the-grey-between/static/js/main.b0bbfa4c.js.map",
+    "787.9d439297.chunk.js.map": "/the-grey-between/static/js/787.9d439297.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b561236f.css",
+    "static/js/main.b0bbfa4c.js"
+  ]
+}
