@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import "./StarMap.css";
 
 import * as THREE from "three";
+import { BloomPass, RenderPass, UnrealBloomPass } from "three-stdlib";
 import {
 	Canvas,
 	useFrame,
@@ -9,10 +10,12 @@ import {
 	ThreeElements,
 	useLoader,
 	ThreeEvent,
+	extend,
 } from "@react-three/fiber";
 import {
 	Bounds,
 	CameraControls,
+	Effects,
 	Grid,
 	OrbitControls,
 	OrbitControlsProps,
@@ -21,6 +24,26 @@ import {
 } from "@react-three/drei";
 import TWEEN from "@tweenjs/tween.js";
 import Stars from "./data/bsc5p_3d.json";
+import { TestBloom } from "./BloomEffect";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
+import {
+	Bloom,
+	LensFlare,
+	EffectComposer,
+	Selection,
+	Select,
+	DotScreen,
+	GodRays,
+	Scanline,
+	ToneMapping,
+} from "@react-three/postprocessing";
+import {
+	BlurPass,
+	Resizer,
+	KernelSize,
+	Resolution,
+	BlendFunction,
+} from "postprocessing";
 
 // Interfaces & Types
 
@@ -300,7 +323,7 @@ const StarPoints = (props: StarPointProps) => {
 		return <></>;
 	}
 	return (
-		<>
+		<Selection>
 			<points
 				ref={pointsRef}
 				onClick={(e) => {
@@ -323,22 +346,46 @@ const StarPoints = (props: StarPointProps) => {
 					{/* <bufferAttribute attach={"attrbiutes-material"} /> */}
 				</bufferGeometry>
 				{/* <pointsMaterial
-				size={0.1}
-				color={0xff00ff}
-				sizeAttenuation={true}
-			/> */}
+					size={0.5}
+					color={0xff00ff}
+					sizeAttenuation={true}
+				/> */}
 				<shaderMaterial attach={"material"} {...pointMaterial} />
 			</points>
-			<mesh ref={sphereRef}>
-				<sphereGeometry args={[0.7, 16, 16]} />
-				{/* <bufferGeometry>
+			<Selection enabled>
+				<EffectComposer>
+					<Bloom
+						intensity={1.0} // The bloom intensity.
+						blurPass={undefined} // A blur pass.
+						kernelSize={KernelSize.LARGE} // blur kernel size
+						luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
+						luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
+						mipmapBlur={false} // Enables or disables mipmap blur.
+						resolutionX={Resolution.AUTO_SIZE} // The horizontal resolution.
+						resolutionY={Resolution.AUTO_SIZE} // The vertical resolution.
+					/>
+				</EffectComposer>
+				<mesh ref={sphereRef}>
+					<sphereGeometry args={[0.7, 16, 16]} />
+					{/* <bufferGeometry>
 					<bufferAttribute
 						attach={"attributes-position"} array={starPos}
 					/>
 				</bufferGeometry> */}
-				<meshStandardMaterial color={"red"} wireframe />
-			</mesh>
-		</>
+					<meshStandardMaterial
+						color={"red"}
+						wireframe
+						emissive={5}
+						emissiveIntensity={4}
+						toneMapped={false}
+					/>
+				</mesh>
+			</Selection>
+			{/* <Effects>
+                <unrealBloomPass threshold={1} strength={0.4} radius={0}/>
+                <outPass args={[ToneMappingMode]};
+            </Effects> */}
+		</Selection>
 	);
 };
 
@@ -426,7 +473,7 @@ export const StarMap = () => {
 			colour.toArray(colours, i * 3);
 			// const colour = new THREE.Color("#f0f");
 			// colours.push(colour);
-			sizes.push(2);
+			sizes.push(1);
 		}
 		// const newStars = { ...Stars, byteLength: 8 };
 		const bufferVertices = new THREE.BufferAttribute(
@@ -461,7 +508,7 @@ export const StarMap = () => {
 				onMouseMoveEvent(e);
 			}}
 		>
-			<ambientLight intensity={0.4} />
+			<ambientLight intensity={1} />
 			<color attach={"background"} args={["black"]} />
 			<Ground />
 			<Suspense fallback={null}>
