@@ -29,7 +29,7 @@ export const Sidebar = () => {
 						className={({ isActive }) =>
 							sidebarItemClassName(isActive)
 						}
-						to="/home"
+						to="/"
 					>
 						Home
 					</NavLink>
