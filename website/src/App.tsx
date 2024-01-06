@@ -21,7 +21,7 @@ function App() {
 				<div className="pageContainer">
 					<Routes>
 						<Route
-							path="/the-grey-between/website"
+							path="/the-grey-between/website/"
 							element={<Home />}
 						/>
 						<Route

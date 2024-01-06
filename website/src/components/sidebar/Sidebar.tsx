@@ -29,7 +29,7 @@ export const Sidebar = () => {
 						className={({ isActive }) =>
 							sidebarItemClassName(isActive)
 						}
-						to="/the-grey-between/website"
+						to="/the-grey-between/website/"
 					>
 						Home
 					</NavLink>
