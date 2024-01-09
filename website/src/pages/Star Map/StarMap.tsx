@@ -1,53 +1,21 @@
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useMemo, useRef, useState } from "react";
 import "./StarMap.css";
 
 import * as THREE from "three";
-import { BloomPass, RenderPass, UnrealBloomPass } from "three-stdlib";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
-	Canvas,
-	useFrame,
-	useThree,
-	ThreeElements,
-	useLoader,
-	ThreeEvent,
-	extend,
-} from "@react-three/fiber";
-import {
-	Bounds,
-	CameraControls,
-	Effects,
 	Grid,
 	OrbitControls,
-	OrbitControlsProps,
 	PerspectiveCamera,
 	useBounds,
 } from "@react-three/drei";
 import TWEEN from "@tweenjs/tween.js";
 import Stars from "./data/bsc5p_3d.json";
-import { TestBloom } from "./BloomEffect";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
-import {
-	Bloom,
-	LensFlare,
-	EffectComposer,
-	Selection,
-	Select,
-	DotScreen,
-	GodRays,
-	Scanline,
-	ToneMapping,
-} from "@react-three/postprocessing";
-import {
-	BlurPass,
-	Resizer,
-	KernelSize,
-	Resolution,
-	BlendFunction,
-} from "postprocessing";
+import { StarPoints } from "./StarPoints";
 
 // Interfaces & Types
 
-interface JSONStar extends SharedArrayBuffer {
+export interface JSONStar extends SharedArrayBuffer {
 	i: number;
 	n: string | null;
 	x: number | null;
@@ -63,57 +31,6 @@ interface RGBColours {
 	g: number;
 	b: number;
 }
-
-// Create a component
-const Star = (props: ThreeElements["mesh"]) => {
-	const ref = useRef<THREE.Mesh>(null!);
-	const [clicked, setClicked] = useState<boolean>(false);
-	const [hovered, setHovered] = useState<boolean>(false);
-
-	const camera = useThree((state) => state.camera);
-	// useFrame((state, delta) => (ref.current.rotation.x += delta));
-
-	return (
-		<mesh
-			{...props}
-			ref={ref}
-			// scale={clicked ? 1.5 : 1}
-			onClick={(event: any) => setClicked(!clicked)}
-			onPointerOver={(event) => setHovered(true)}
-			onPointerOut={(event) => setHovered(false)}
-		>
-			<pointLight position={props.position} intensity={100} />
-			<sphereGeometry args={[100, 16, 16]} />
-			{/* <circleGeometry args={[3, 4]} /> */}
-			<meshStandardMaterial
-				emissive="red"
-				emissiveIntensity={20}
-				color={hovered ? "hotpink" : "orange"}
-			/>
-		</mesh>
-	);
-};
-
-const Planet = (props: ThreeElements["mesh"]) => {
-	const ref = useRef<THREE.Mesh>(null!);
-	const [clicked, setClicked] = useState<boolean>(false);
-	const [hovered, setHovered] = useState<boolean>(false);
-	// useFrame((state, delta) => (ref.current.rotation.x += delta));
-
-	return (
-		<mesh
-			{...props}
-			ref={ref}
-			// scale={clicked ? 1.5 : 1}
-			onClick={(event: any) => setClicked(!clicked)}
-			onPointerOver={(event) => setHovered(true)}
-			onPointerOut={(event) => setHovered(false)}
-		>
-			<sphereGeometry args={[1, 16, 16]} />
-			<meshStandardMaterial color={hovered ? "hotpink" : "green"} />
-		</mesh>
-	);
-};
 
 // This component wraps children in a group with a click handler
 // Clicking any object will refresh and fit bounds
@@ -131,263 +48,12 @@ function SelectToZoom({ children }: any) {
 	);
 }
 
-interface StarPointProps {
-	starsBuffer: StarsBufferAttributes;
-	pointerPos: THREE.Vector2;
-	highlightIndex: number | null;
-	setHighlightIndex: React.Dispatch<React.SetStateAction<number | null>>;
-	cameraControlsRef: any;
-}
-
-interface StarsBufferAttributes {
+export interface StarsBufferAttributes {
+	names: string[];
 	positions: THREE.BufferAttribute;
 	colours: THREE.BufferAttribute;
 	sizes: THREE.BufferAttribute;
 }
-
-const StarPoints = (props: StarPointProps) => {
-	const { gl, scene, raycaster, camera } = useThree();
-	// let intersectIndex: number | null = null;
-
-	// Define Point Materials
-	const vertexShaderText = `
-    attribute float size;
-    attribute vec3 customColor;
-
-    varying vec3 vColor;
-
-    void main() {
-
-        vColor = customColor;
-
-        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-
-        gl_PointSize = 0.1 + size * ( 300.0 / -mvPosition.z );
-
-        gl_Position = projectionMatrix * mvPosition;
-
-    }`;
-	const fragmentShaderText = `
-    uniform vec3 color;
-    uniform sampler2D pointTexture;
-    uniform float alphaTest;
-
-    varying vec3 vColor;
-
-    void main() {
-
-        gl_FragColor = vec4( color * vColor, 1.0 );
-
-        gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
-
-        if ( gl_FragColor.a < alphaTest ) discard;
-
-    }`;
-	const discTexture = useLoader(THREE.TextureLoader, "disc.png");
-	const pointMaterial = useMemo(
-		() => ({
-			uniforms: {
-				color: { value: new THREE.Color(0xffffff) },
-				pointTexture: {
-					value: discTexture,
-				},
-				alphaTest: { value: 0.9 },
-			},
-			vertexShader: vertexShaderText,
-			fragmentShader: fragmentShaderText,
-		}),
-		[]
-	);
-	const pointsRef = useRef<THREE.Points>(null);
-
-	// Highlight Sphere
-	const sphereRef = useRef<THREE.Mesh>(null);
-	// const starPos = new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3);
-
-	// Handle star select
-	function onClickEvent(e: ThreeEvent<MouseEvent>): void {
-		const points = pointsRef.current;
-		const orbitControls = props.cameraControlsRef.current;
-		if (
-			points === null ||
-			props.highlightIndex === null ||
-			orbitControls === null
-		) {
-			return;
-		}
-
-		const positions = points.geometry.attributes.position.array;
-		const x = positions[props.highlightIndex * 3];
-		const y = positions[props.highlightIndex * 3 + 1];
-		const z = positions[props.highlightIndex * 3 + 2];
-
-		const worldScale = new THREE.Vector3();
-		points.getWorldScale(worldScale);
-		console.log(worldScale);
-
-		const oldPos = camera.position;
-		const targetPos = new THREE.Vector3(x, y, z);
-
-		// Tween to new target
-		new TWEEN.Tween(orbitControls.target)
-			.to(targetPos, 2000)
-			.easing(TWEEN.Easing.Cubic.Out)
-			.start();
-
-		// Tween to new camera location
-		//      Point in-between old and new position
-
-		// Get unit vector
-		const unitVector = new THREE.Vector3();
-		unitVector.subVectors(oldPos, targetPos).normalize();
-		const newPos = new THREE.Vector3(
-			targetPos.x + unitVector.x * 10,
-			targetPos.y + unitVector.y * 10,
-			targetPos.z + unitVector.z * 10
-		);
-
-		new TWEEN.Tween(camera.position)
-			.to(newPos, 2500)
-			.easing(TWEEN.Easing.Cubic.Out)
-			.start();
-	}
-
-	// Perform per-frame actions
-	useFrame((state, delta, xrFrame) => {
-		// Handle stars mouseover
-		const points = pointsRef.current;
-		const highlightSphere = sphereRef.current;
-		let tempHighlightIndex = props.highlightIndex;
-
-		if (points === null || highlightSphere === null) {
-			return;
-		}
-
-		// Points geometry
-		const geometry = points.geometry;
-		const attributes = geometry.attributes;
-
-		// Sphere geometry
-		// highlightSphere.position;
-
-		raycaster.setFromCamera(props.pointerPos, camera);
-		const intersectedObjs = raycaster.intersectObject(points);
-
-		if (intersectedObjs.length > 0) {
-			if (
-				tempHighlightIndex == null &&
-				intersectedObjs[0].index &&
-				tempHighlightIndex != intersectedObjs[0].index
-			) {
-				tempHighlightIndex = intersectedObjs[0].index;
-				attributes.size.array[tempHighlightIndex] = 3;
-				attributes.size.needsUpdate = true;
-
-				// Show highlight sphere
-				const x = attributes.position.array[tempHighlightIndex * 3];
-				const y = attributes.position.array[tempHighlightIndex * 3 + 1];
-				const z = attributes.position.array[tempHighlightIndex * 3 + 2];
-
-				highlightSphere.position.set(x, y, z);
-
-				// Move camera
-				// camera.lookAt(x, y, z);
-			}
-		} else if (tempHighlightIndex !== null) {
-			attributes.size.array[tempHighlightIndex] = 2;
-			attributes.size.needsUpdate = true;
-			tempHighlightIndex = null;
-		}
-		props.setHighlightIndex(tempHighlightIndex);
-
-		// gl.render(scene, camera);
-	});
-
-	// useEffect(() => {
-	// 	const tempVertShader =
-	// 		document.getElementById("vertexShader")?.textContent;
-	// 	const tempFragShader =
-	// 		document.getElementById("fragmentShader")?.textContent;
-
-	// 	if (tempVertShader != null) {
-	// 		vertexShaderText = tempVertShader;
-	// 	}
-	// 	if (tempFragShader != null) {
-	// 		fragmentShaderText = tempFragShader;
-	// 	}
-
-	// 	gl.compile(scene, camera);
-	// }, []);
-
-	if (Stars == null) {
-		return <></>;
-	}
-	return (
-		<Selection>
-			<points
-				ref={pointsRef}
-				onClick={(e) => {
-					onClickEvent(e);
-				}}
-			>
-				<bufferGeometry>
-					<bufferAttribute
-						attach={"attributes-position"}
-						{...props.starsBuffer.positions}
-					/>
-					<bufferAttribute
-						attach={"attributes-customColor"}
-						{...props.starsBuffer.colours}
-					/>
-					<bufferAttribute
-						attach={"attributes-size"}
-						{...props.starsBuffer.sizes}
-					/>
-					{/* <bufferAttribute attach={"attrbiutes-material"} /> */}
-				</bufferGeometry>
-				{/* <pointsMaterial
-					size={0.5}
-					color={0xff00ff}
-					sizeAttenuation={true}
-				/> */}
-				<shaderMaterial attach={"material"} {...pointMaterial} />
-			</points>
-			<Selection enabled>
-				<EffectComposer>
-					<Bloom
-						intensity={1.0} // The bloom intensity.
-						blurPass={undefined} // A blur pass.
-						kernelSize={KernelSize.LARGE} // blur kernel size
-						luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
-						luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
-						mipmapBlur={false} // Enables or disables mipmap blur.
-						resolutionX={Resolution.AUTO_SIZE} // The horizontal resolution.
-						resolutionY={Resolution.AUTO_SIZE} // The vertical resolution.
-					/>
-				</EffectComposer>
-				<mesh ref={sphereRef}>
-					<sphereGeometry args={[0.7, 16, 16]} />
-					{/* <bufferGeometry>
-					<bufferAttribute
-						attach={"attributes-position"} array={starPos}
-					/>
-				</bufferGeometry> */}
-					<meshStandardMaterial
-						color={"red"}
-						wireframe
-						emissive={5}
-						emissiveIntensity={4}
-						toneMapped={false}
-					/>
-				</mesh>
-			</Selection>
-			{/* <Effects>
-                <unrealBloomPass threshold={1} strength={0.4} radius={0}/>
-                <outPass args={[ToneMappingMode]};
-            </Effects> */}
-		</Selection>
-	);
-};
 
 // Grid for reference
 const Ground = () => {
@@ -455,6 +121,7 @@ export const StarMap = () => {
 	// const [colourStates, setColourStates] = useState();
 
 	const starsBuffer = useMemo(() => {
+		const starNames: string[] = [];
 		const starVertices = [];
 		const colours: number[] = [];
 		const sizes: number[] = [];
@@ -462,20 +129,39 @@ export const StarMap = () => {
 
 		const mult = 3;
 		for (var i = 0; i < Stars.length; i++) {
+			// Set name
+			starNames.push(Stars[i].n);
+
+			// Set position
 			const x = Stars[i].x;
 			const y = Stars[i].y;
 			const z = Stars[i].z;
 			if (x != null && y != null && z != null) {
 				starVertices.push(x * mult, y * mult, z * mult);
 			}
-			colour.setRGB(1, 1, 1);
+
+			// Set colour
+			const tempColour = Stars[i].K;
+			if (tempColour != null) {
+				colour.setRGB(tempColour.r, tempColour.g, tempColour.b);
+			} else {
+				colour.setRGB(1, 1, 1);
+			}
 			// colour.setHSL(0.01 + 0.1 * (i / Stars.length), 1.0, 0.5);
 			colour.toArray(colours, i * 3);
 			// const colour = new THREE.Color("#f0f");
 			// colours.push(colour);
+
+			// Set sizes
 			sizes.push(1);
 		}
-		// const newStars = { ...Stars, byteLength: 8 };
+
+		// Create buffer attributes
+		// const bufferNames = new THREE.BufferAttribute(
+		// 	//@ts-ignore
+		// 	new Float32Array(starNames),
+		// 	1
+		// );
 		const bufferVertices = new THREE.BufferAttribute(
 			new Float32Array(starVertices),
 			3
@@ -489,6 +175,7 @@ export const StarMap = () => {
 			1
 		);
 		return {
+			names: starNames,
 			positions: bufferVertices,
 			colours: bufferColours,
 			sizes: bufferSizes,
