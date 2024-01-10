@@ -29,7 +29,7 @@ export const Sidebar = () => {
 						className={({ isActive }) =>
 							sidebarItemClassName(isActive)
 						}
-						to="/the-grey-between/"
+						to="/"
 					>
 						Home
 					</NavLink>
@@ -37,7 +37,7 @@ export const Sidebar = () => {
 						className={({ isActive }) =>
 							sidebarItemClassName(isActive)
 						}
-						to="/the-grey-between/starmap"
+						to="/starmap"
 					>
 						Star Map
 					</NavLink>
