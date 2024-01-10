@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/the-grey-between/static/css/main.97d50194.css",
-    "main.js": "/the-grey-between/static/js/main.d1bd8cfb.js",
-    "static/js/787.9d439297.chunk.js": "/the-grey-between/static/js/787.9d439297.chunk.js",
-    "index.html": "/the-grey-between/index.html",
-    "main.97d50194.css.map": "/the-grey-between/static/css/main.97d50194.css.map",
-    "main.d1bd8cfb.js.map": "/the-grey-between/static/js/main.d1bd8cfb.js.map",
-    "787.9d439297.chunk.js.map": "/the-grey-between/static/js/787.9d439297.chunk.js.map"
+    "main.css": "/the-grey-between/website/static/css/main.97d50194.css",
+    "main.js": "/the-grey-between/website/static/js/main.32db31a1.js",
+    "static/js/787.9d439297.chunk.js": "/the-grey-between/website/static/js/787.9d439297.chunk.js",
+    "index.html": "/the-grey-between/website/index.html",
+    "main.97d50194.css.map": "/the-grey-between/website/static/css/main.97d50194.css.map",
+    "main.32db31a1.js.map": "/the-grey-between/website/static/js/main.32db31a1.js.map",
+    "787.9d439297.chunk.js.map": "/the-grey-between/website/static/js/787.9d439297.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.97d50194.css",
-    "static/js/main.d1bd8cfb.js"
+    "static/js/main.32db31a1.js"
   ]
 }
