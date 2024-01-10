@@ -4,15 +4,25 @@ import { Star } from "./Star";
 import { Planet } from "./Planet";
 
 interface SolarSystemProps {
-	starInfo: JSONStar;
-	planetList: string[];
+	// starInfo: JSONStar;
+	// planetList: string[];
+	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
+	starData: JSONStar;
 }
+
+function onStarClick() {}
 
 export const SolarSystem = (props: SolarSystemProps) => {
 	return (
 		<group>
-			<Star position={[0, 0, 0]} />
-			<Planet position={[-5, -5, 0]} />
+			<Star
+				onClick={() => {
+					props.setShowStarMap(true);
+				}}
+				position={[0, 0, 0]}
+				data={props.starData}
+			/>
+			<Planet position={[-30, 0, 0]} />
 		</group>
 	);
 };

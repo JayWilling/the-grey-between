@@ -5,9 +5,15 @@ import * as THREE from "three";
 import { useFrame, useThree, useLoader, ThreeEvent } from "@react-three/fiber";
 import TWEEN from "@tweenjs/tween.js";
 import Stars from "./data/bsc5p_3d.json";
-import { Selection, Select } from "@react-three/postprocessing";
-import { Html, Text } from "@react-three/drei";
+import {
+	Selection,
+	Select,
+	EffectComposer,
+	Bloom,
+} from "@react-three/postprocessing";
+import { Html, Text, Effects } from "@react-three/drei";
 import { StarsBufferAttributes } from "./StarMap";
+import { TestBloom } from "./BloomEffect";
 
 interface StarPointProps {
 	starsBuffer: StarsBufferAttributes;
@@ -15,6 +21,11 @@ interface StarPointProps {
 	highlightIndex: number | null;
 	setHighlightIndex: React.Dispatch<React.SetStateAction<number | null>>;
 	cameraControlsRef: any;
+	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
+	selectedIndex: number | null;
+	setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+	onClickEvent: (e: ThreeEvent<MouseEvent>) => void;
+	pointsRef: React.RefObject<THREE.Points>;
 }
 
 export const StarPoints = (props: StarPointProps) => {
@@ -27,6 +38,7 @@ export const StarPoints = (props: StarPointProps) => {
     attribute vec3 customColor;
 
     varying vec3 vColor;
+    varying vec2 vUv;
 
     void main() {
 
@@ -34,28 +46,36 @@ export const StarPoints = (props: StarPointProps) => {
 
         vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-        gl_PointSize = 0.1 + size * ( 300.0 / -mvPosition.z );
+        gl_PointSize = 3.0 + size * (300.0 / -mvPosition.z);
 
         gl_Position = projectionMatrix * mvPosition;
 
+        vUv = uv;
+
     }`;
+
+	const temp = "gl_PointSize = 0.1 + size * ( 300.0 / -mvPosition.z );";
 	const fragmentShaderText = `
     uniform vec3 color;
     uniform sampler2D pointTexture;
+    uniform sampler2D bloomTexture;
+    uniform sampler2D baseTexture;
     uniform float alphaTest;
 
     varying vec3 vColor;
+    varying vec2 vUv;
 
     void main() {
 
         gl_FragColor = vec4( color * vColor, 1.0 );
 
-        gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );
+        gl_FragColor = gl_FragColor * ( texture2D( pointTexture, gl_PointCoord ) + vec4(0.5));
 
         if ( gl_FragColor.a < alphaTest ) discard;
 
     }`;
-	const discTexture = useLoader(THREE.TextureLoader, "disc.png");
+	const tempFrag = `gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );`;
+	const discTexture = useLoader(THREE.TextureLoader, "bigDisc.png");
 	const pointMaterial = useMemo(
 		() => ({
 			uniforms: {
@@ -70,7 +90,7 @@ export const StarPoints = (props: StarPointProps) => {
 		}),
 		[]
 	);
-	const pointsRef = useRef<THREE.Points>(null);
+	// const pointsRef = useRef<THREE.Points>(null);
 
 	// Connecting lines
 	const linesRef = useRef<THREE.LineSegments>(null);
@@ -150,69 +170,76 @@ export const StarPoints = (props: StarPointProps) => {
 	const sphereRef = useRef<THREE.Mesh>(null);
 	const selectedStarLabelRef = useRef<THREE.Mesh>(null);
 	let starName = "Sol";
-	// const starPos = new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3);
 
 	// Handle star select
-	function onClickEvent(e: ThreeEvent<MouseEvent>): void {
-		const points = pointsRef.current;
-		const orbitControls = props.cameraControlsRef.current;
-		const starLabel = selectedStarLabelRef.current;
-		if (
-			points === null ||
-			props.highlightIndex === null ||
-			orbitControls === null ||
-			starLabel === null
-		) {
-			return;
-		}
+	// function onClickEvent(e: ThreeEvent<MouseEvent>): void {
+	// 	const points = pointsRef.current;
+	// 	const starLabel = selectedStarLabelRef.current;
+	// 	if (
+	// 		points === null ||
+	// 		props.highlightIndex === null ||
+	// 		starLabel === null
+	// 	) {
+	// 		return;
+	// 	}
 
-		const positions = points.geometry.attributes.position.array;
-		const x = positions[props.highlightIndex * 3];
-		const y = positions[props.highlightIndex * 3 + 1];
-		const z = positions[props.highlightIndex * 3 + 2];
+	// 	const positions = points.geometry.attributes.position.array;
+	// 	const x = positions[props.highlightIndex * 3];
+	// 	const y = positions[props.highlightIndex * 3 + 1];
+	// 	const z = positions[props.highlightIndex * 3 + 2];
 
-		const worldScale = new THREE.Vector3();
-		points.getWorldScale(worldScale);
-		console.log(worldScale);
+	// 	// Tween to new target
+	// 	updateCameraPosition(x, y, z);
 
-		const oldPos = camera.position;
-		const targetPos = new THREE.Vector3(x, y, z);
+	// 	// Update the selected star
+	// 	props.setSelectedIndex(props.highlightIndex);
 
-		// Tween to new target
-		new TWEEN.Tween(orbitControls.target)
-			.to(targetPos, 2000)
-			.easing(TWEEN.Easing.Cubic.Out)
-			.start();
+	// 	// Move the text object and type out the selected star name
+	// 	//@ts-ignore
+	// 	// starName = props.starsBuffer.names[props.highlightIndex];
+	// 	// console.log(starName);
+	// 	// const newNameLabel = new CSS2
+	// 	// starLabel.position.set(targetPos.x + 1, targetPos.y - 1, targetPos.z);
+	// }
 
-		// Tween to new camera location
-		//   -  Point in-between old and new position
-		//
-		// Get unit vector
-		const unitVector = new THREE.Vector3();
-		unitVector.subVectors(oldPos, targetPos).normalize();
-		const newPos = new THREE.Vector3(
-			targetPos.x + unitVector.x * 10,
-			targetPos.y + unitVector.y * 10,
-			targetPos.z + unitVector.z * 10
-		);
+	// function updateCameraPosition(x: number, y: number, z: number): void {
+	// 	const orbitControls = props.cameraControlsRef.current;
+	// 	const oldPos = camera.position;
+	// 	const targetPos = new THREE.Vector3(x, y, z);
 
-		new TWEEN.Tween(camera.position)
-			.to(newPos, 2500)
-			.easing(TWEEN.Easing.Cubic.Out)
-			.start();
+	// 	if (orbitControls === null) return;
 
-		// Move the text object and type out the selected star name
-		//@ts-ignore
-		starName = props.starsBuffer.names[props.highlightIndex];
-		console.log(starName);
-		// const newNameLabel = new CSS2
-		starLabel.position.set(targetPos.x + 1, targetPos.y - 1, targetPos.z);
-	}
+	// 	if (props.highlightIndex != props.selectedIndex) {
+	// 		new TWEEN.Tween(orbitControls.target)
+	// 			.to(targetPos, 2000)
+	// 			.easing(TWEEN.Easing.Cubic.Out)
+	// 			.start();
+
+	// 		// Tween to new camera location
+	// 		//   -  Point in-between old and new position
+	// 		//
+	// 		// Get unit vector
+	// 		const unitVector = new THREE.Vector3();
+	// 		unitVector.subVectors(oldPos, targetPos).normalize();
+	// 		const newPos = new THREE.Vector3(
+	// 			targetPos.x + unitVector.x * 10,
+	// 			targetPos.y + unitVector.y * 10,
+	// 			targetPos.z + unitVector.z * 10
+	// 		);
+
+	// 		new TWEEN.Tween(camera.position)
+	// 			.to(newPos, 2500)
+	// 			.easing(TWEEN.Easing.Cubic.Out)
+	// 			.start();
+	// 	} else {
+	// 		props.setShowStarMap(false);
+	// 	}
+	// }
 
 	// Perform per-frame actions
 	useFrame((state, delta, xrFrame) => {
 		// Handle stars mouseover
-		const points = pointsRef.current;
+		const points = props.pointsRef.current;
 		const highlightSphere = sphereRef.current;
 		let tempHighlightIndex = props.highlightIndex;
 
@@ -256,44 +283,17 @@ export const StarPoints = (props: StarPointProps) => {
 			tempHighlightIndex = null;
 		}
 		props.setHighlightIndex(tempHighlightIndex);
-
-		// gl.render(scene, camera);
 	});
-
-	//@ts-ignore
-	// function Annotation({ children, ...props }) {
-	// 	return (
-	// 		<Html {...props} transform occlude="blending">
-	// 			<h1 style={{ background: "red", margin: 0 }}>Hello World</h1>
-	// 		</Html>
-	// 	);
-	// }
-
-	// useEffect(() => {
-	// 	const tempVertShader =
-	// 		document.getElementById("vertexShader")?.textContent;
-	// 	const tempFragShader =
-	// 		document.getElementById("fragmentShader")?.textContent;
-
-	// 	if (tempVertShader != null) {
-	// 		vertexShaderText = tempVertShader;
-	// 	}
-	// 	if (tempFragShader != null) {
-	// 		fragmentShaderText = tempFragShader;
-	// 	}
-
-	// 	gl.compile(scene, camera);
-	// }, []);
 
 	if (Stars == null) {
 		return <></>;
 	}
 	return (
-		<Selection>
+		<Selection enabled>
 			<points
-				ref={pointsRef}
+				ref={props.pointsRef}
 				onClick={(e) => {
-					onClickEvent(e);
+					props.onClickEvent(e);
 				}}
 			>
 				<bufferGeometry>
@@ -318,9 +318,6 @@ export const StarPoints = (props: StarPointProps) => {
 				/> */}
 				<shaderMaterial attach={"material"} {...pointMaterial} />
 			</points>
-			{/* <Annotation position={[0, 0, 0]}>
-				<span style={{ fontSize: "1.5em" }}>🌕</span> Aglaia
-			</Annotation> */}
 			{/* <Html
 				as="span"
 				style={{
@@ -366,40 +363,17 @@ export const StarPoints = (props: StarPointProps) => {
 					transparent={true}
 				/>
 			</lineSegments> */}
-			<Selection enabled>
-				{/* EffectComposer and Bloom massively slows everything down. Proceed with caution */}
-				{/* <EffectComposer>
-					<Bloom
-						intensity={1.0} // The bloom intensity.
-						blurPass={undefined} // A blur pass.
-						kernelSize={KernelSize.LARGE} // blur kernel size
-						luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
-						luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
-						mipmapBlur={false} // Enables or disables mipmap blur.
-						resolutionX={Resolution.AUTO_SIZE} // The horizontal resolution.
-						resolutionY={Resolution.AUTO_SIZE} // The vertical resolution.
-					/>
-				</EffectComposer> */}
-				<mesh ref={sphereRef}>
-					<sphereGeometry args={[0.7, 16, 16]} />
-					{/* <bufferGeometry>
-					<bufferAttribute
-						attach={"attributes-position"} array={starPos}
-					/>
-				</bufferGeometry> */}
-					<meshStandardMaterial
-						color={"red"}
-						wireframe
-						emissive={5}
-						emissiveIntensity={4}
-						toneMapped={false}
-					/>
-				</mesh>
-			</Selection>
-			{/* <Effects>
-                <unrealBloomPass threshold={1} strength={0.4} radius={0}/>
-                <outPass args={[ToneMappingMode]};
-            </Effects> */}
+			<mesh ref={sphereRef}>
+				<sphereGeometry args={[0.7, 16, 16]} />
+				<meshStandardMaterial
+					color={"red"}
+					wireframe
+					emissive={"red"}
+					emissiveIntensity={4}
+					toneMapped={false}
+				/>
+			</mesh>
+			<TestBloom />
 		</Selection>
 	);
 };
