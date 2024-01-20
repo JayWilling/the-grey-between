@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
 	<React.StrictMode>
-		<BrowserRouter>
+		<BrowserRouter basename="/the-grey-between/website">
 			<App />
 		</BrowserRouter>
 	</React.StrictMode>

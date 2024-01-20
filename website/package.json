@@ -1,6 +1,6 @@
 {
   "name": "the-grey-between",
-  "homepage": "https://jaywilling.github.io/the-grey-between/website/",
+  "homepage": "https://jaywilling.github.io/the-grey-between/website",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.1.1",
+    "ts-shader-loader": "^2.0.2"
   }
 }

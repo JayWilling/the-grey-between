@@ -1,19 +1,16 @@
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef } from "react";
 import "./StarMap.css";
 
 import * as THREE from "three";
 import { useFrame, useThree, useLoader, ThreeEvent } from "@react-three/fiber";
-import TWEEN from "@tweenjs/tween.js";
 import Stars from "./data/bsc5p_3d.json";
-import {
-	Selection,
-	Select,
-	EffectComposer,
-	Bloom,
-} from "@react-three/postprocessing";
-import { Html, Text, Effects } from "@react-three/drei";
+import { Selection } from "@react-three/postprocessing";
+import { Circle, Text } from "@react-three/drei";
 import { StarsBufferAttributes } from "./StarMap";
 import { TestBloom } from "./BloomEffect";
+// import vertexShaderText from "./shaders/bloomVertexShader.vs.glsl";
+// import fragmentShaderText from "./shaders/bloomFragmentShader.fs.glsl";
+import { LensFlareEffect, LensFlareParams } from "./shaders/lensFlareTemp.js";
 
 interface StarPointProps {
 	starsBuffer: StarsBufferAttributes;
@@ -29,53 +26,52 @@ interface StarPointProps {
 }
 
 export const StarPoints = (props: StarPointProps) => {
-	const { gl, scene, raycaster, camera } = useThree();
+	const { scene, raycaster, camera } = useThree();
 	// let intersectIndex: number | null = null;
 
 	// Define Point Materials
 	const vertexShaderText = `
-    attribute float size;
-    attribute vec3 customColor;
+	attribute float size;
+	attribute vec3 customColor;
 
-    varying vec3 vColor;
-    varying vec2 vUv;
+	varying vec3 vColor;
+	varying vec2 vUv;
 
-    void main() {
+	void main() {
 
-        vColor = customColor;
+	    vColor = customColor;
 
-        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+	    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-        gl_PointSize = 3.0 + size * (300.0 / -mvPosition.z);
+	    gl_PointSize = 0.2 + size * (300.0 / -mvPosition.z);
 
-        gl_Position = projectionMatrix * mvPosition;
+	    gl_Position = projectionMatrix * mvPosition;
 
-        vUv = uv;
+	    vUv = uv;
 
-    }`;
+	}`;
 
-	const temp = "gl_PointSize = 0.1 + size * ( 300.0 / -mvPosition.z );";
 	const fragmentShaderText = `
-    uniform vec3 color;
-    uniform sampler2D pointTexture;
-    uniform sampler2D bloomTexture;
-    uniform sampler2D baseTexture;
-    uniform float alphaTest;
+	uniform vec3 color;
+	uniform sampler2D pointTexture;
+	uniform sampler2D bloomTexture;
+	uniform sampler2D baseTexture;
+	uniform float alphaTest;
 
-    varying vec3 vColor;
-    varying vec2 vUv;
+	varying vec3 vColor;
+	varying vec2 vUv;
 
-    void main() {
+	void main() {
 
-        gl_FragColor = vec4( color * vColor, 1.0 );
+	    gl_FragColor = vec4( color * vColor * 2.0, 1.0 );
 
-        gl_FragColor = gl_FragColor * ( texture2D( pointTexture, gl_PointCoord ) + vec4(0.5));
+	    gl_FragColor = gl_FragColor * ( texture2D( pointTexture, gl_PointCoord ) + vec4(0.3));
 
-        if ( gl_FragColor.a < alphaTest ) discard;
+	    if ( gl_FragColor.a < alphaTest ) discard;
 
-    }`;
-	const tempFrag = `gl_FragColor = gl_FragColor * texture2D( pointTexture, gl_PointCoord );`;
+	}`;
 	const discTexture = useLoader(THREE.TextureLoader, "bigDisc.png");
+	// console.log(vertexShaderText);
 	const pointMaterial = useMemo(
 		() => ({
 			uniforms: {
@@ -90,86 +86,42 @@ export const StarPoints = (props: StarPointProps) => {
 		}),
 		[]
 	);
-	// const pointsRef = useRef<THREE.Points>(null);
-
-	// Connecting lines
-	const linesRef = useRef<THREE.LineSegments>(null);
-	const lineMaterial = useMemo(
-		() => ({
-			vertexColors: true,
-			blending: THREE.AdditiveBlending,
-			transparent: true,
-		}),
-		[]
-	);
-	const linesBuffer = useMemo(() => {
-		// Define arrays for line positions and colours
-
-		const linePositions = new Float32Array(
-			props.starsBuffer.positions.array.length
-		);
-		const lineColours = new Float32Array(
-			props.starsBuffer.positions.array.length
-		);
-
-		// Loop over the known/near stars
-		const minDistance = 50;
-		const maxConnections = 8;
-		let currentConnections = 0;
-		let vertexPos = 0;
-		let colourPos = 0;
-		const nearStars = props.starsBuffer.positions.array;
-		// for (let i = 0; i < nearStars.length; i++) {
-		// 	// For each star, check for nearby stars
-		// 	for (let j = 0; j < nearStars.length; j++) {
-		// 		const dx = nearStars[i * 3] - nearStars[j * 3];
-		// 		const dy = nearStars[i * 3 + 1] - nearStars[j * 3 + 1];
-		// 		const dz = nearStars[i * 3 + 2] - nearStars[j * 3 + 2];
-		// 		const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-		// 		if (
-		// 			distance < minDistance &&
-		// 			vertexPos < nearStars.length * 3 &&
-		// 			currentConnections < maxConnections
-		// 		) {
-		// 			currentConnections++;
-		// 			const alpha = 1.0 - distance / minDistance;
-		// 			// Add the new line segment start
-		// 			linePositions[vertexPos++] = nearStars[i * 3];
-		// 			linePositions[vertexPos++] = nearStars[i * 3 + 1];
-		// 			linePositions[vertexPos++] = nearStars[i * 3 + 2];
-		// 			// Add the new line segment end
-		// 			linePositions[vertexPos++] = nearStars[j * 3];
-		// 			linePositions[vertexPos++] = nearStars[j * 3 + 1];
-		// 			linePositions[vertexPos++] = nearStars[j * 3 + 2];
-		// 			// Add the line segment colour
-		// 			lineColours[colourPos++] = alpha;
-		// 			lineColours[colourPos++] = alpha;
-		// 			lineColours[colourPos++] = alpha;
-		// 		}
-		// 	}
-		// 	currentConnections = 0;
-		// }
-
-		// Create the buffer attributes
-		const linePositionsAttribute = new THREE.BufferAttribute(
-			linePositions,
-			3
-		).setUsage(THREE.StaticDrawUsage);
-		const lineColoursAttribute = new THREE.BufferAttribute(
-			lineColours,
-			3
-		).setUsage(THREE.StaticDrawUsage);
-		return {
-			positions: linePositionsAttribute,
-			colours: lineColoursAttribute,
-		};
-	}, []);
 
 	// Highlight Sphere
 	const sphereRef = useRef<THREE.Mesh>(null);
 	const selectedStarLabelRef = useRef<THREE.Mesh>(null);
+	const circleRef = useRef<THREE.Mesh>(null);
 	let starName = "Sol";
+
+	// Lens Flare
+	const oldOpacity = { value: 0.8 };
+	const colorProp = { colorGain: { value: "#063684" } };
+
+	const lensFlareEffectMaterial = useMemo(() => {
+		return LensFlareEffect(
+			{
+				enabled: true,
+				lensPosition: new THREE.Vector3(25, 2, -40),
+				opacity: 0.8,
+				colorGain: new THREE.Color(colorProp.colorGain.value),
+				starPoints: 3,
+				glareSize: 0.2,
+				flareSize: 0.004,
+				flareSpeed: 0.4,
+				flareShape: 1.2,
+				haloScale: 0.5,
+				animated: false,
+				anamorphic: true,
+				secondaryGhosts: false,
+				starBurst: false,
+				ghostScale: 0.23,
+				aditionalStreaks: false,
+				followMouse: false,
+			},
+			oldOpacity
+		);
+	}, []);
+	// scene.add(lensFlareEffect);
 
 	// Handle star select
 	// function onClickEvent(e: ThreeEvent<MouseEvent>): void {
@@ -241,6 +193,7 @@ export const StarPoints = (props: StarPointProps) => {
 		// Handle stars mouseover
 		const points = props.pointsRef.current;
 		const highlightSphere = sphereRef.current;
+		const highlightCircle = circleRef.current;
 		let tempHighlightIndex = props.highlightIndex;
 
 		if (points === null || highlightSphere === null) {
@@ -273,6 +226,7 @@ export const StarPoints = (props: StarPointProps) => {
 				const z = attributes.position.array[tempHighlightIndex * 3 + 2];
 
 				highlightSphere.position.set(x, y, z);
+				// highlightCircle.position.set(x, y, z);
 
 				// Move camera
 				// camera.lookAt(x, y, z);
@@ -308,6 +262,10 @@ export const StarPoints = (props: StarPointProps) => {
 					<bufferAttribute
 						attach={"attributes-size"}
 						{...props.starsBuffer.sizes}
+					/>
+					<bufferAttribute
+						attach={"attributes-starIndex"}
+						{...props.starsBuffer.index}
 					/>
 					{/* <bufferAttribute attach={"attrbiutes-material"} /> */}
 				</bufferGeometry>
@@ -364,7 +322,11 @@ export const StarPoints = (props: StarPointProps) => {
 				/>
 			</lineSegments> */}
 			<mesh ref={sphereRef}>
-				<sphereGeometry args={[0.7, 16, 16]} />
+				<sphereGeometry
+					args={[0.7, 16, 16]}
+					// attach={"material"}
+					// {...lensFlareEffectMaterial}
+				/>
 				<meshStandardMaterial
 					color={"red"}
 					wireframe
@@ -374,6 +336,7 @@ export const StarPoints = (props: StarPointProps) => {
 				/>
 			</mesh>
 			<TestBloom />
+			{/* <Circle ref={circleRef} /> */}
 		</Selection>
 	);
 };

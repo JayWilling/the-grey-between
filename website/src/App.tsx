@@ -20,14 +20,8 @@ function App() {
 				<Sidebar />
 				<div className="pageContainer">
 					<Routes>
-						<Route
-							path="/the-grey-between/website"
-							element={<Home />}
-						/>
-						<Route
-							path="/the-grey-between/website/starmap"
-							element={<StarMapCanvas />}
-						/>
+						<Route path="/" element={<Home />} />
+						<Route path="/starmap" element={<StarMapCanvas />} />
 					</Routes>
 				</div>
 			</div>
