@@ -194,7 +194,7 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 			state.clock.getElapsedTime()
 		);
 		t = state.clock.getElapsedTime();
-		const y = props.starParent.y;
+		const y = props.starParent.y * POSITION_MULTIPLIER;
 		// setPosition([x, y, z]);
 		if (meshRef.current) {
 			meshRef.current.position.set(x, y, z);
