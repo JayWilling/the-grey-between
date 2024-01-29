@@ -11,12 +11,16 @@ import { TestBloom } from "./BloomEffect";
 // import vertexShaderText from "./shaders/bloomVertexShader.vs.glsl";
 // import fragmentShaderText from "./shaders/bloomFragmentShader.fs.glsl";
 import { LensFlareEffect, LensFlareParams } from "./shaders/lensFlareTemp.js";
+import { objectToScreenPosition, vectorToScreenPosition } from "./utils";
 
 interface StarPointProps {
 	starsBuffer: StarsBufferAttributes;
 	pointerPos: THREE.Vector2;
 	highlightIndex: number | null;
 	setHighlightIndex: React.Dispatch<React.SetStateAction<number | null>>;
+	setHighlightPosition: React.Dispatch<
+		React.SetStateAction<{ x: number; y: number } | null>
+	>;
 	cameraControlsRef: any;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedIndex: number | null;
@@ -26,7 +30,7 @@ interface StarPointProps {
 }
 
 export const StarPoints = (props: StarPointProps) => {
-	const { scene, raycaster, camera } = useThree();
+	const { gl, scene, raycaster, camera } = useThree();
 	// let intersectIndex: number | null = null;
 
 	// Define Point Materials
@@ -71,7 +75,7 @@ export const StarPoints = (props: StarPointProps) => {
 
 	}`;
 	const discTexture = useLoader(THREE.TextureLoader, "bigDisc.png");
-	// console.log(vertexShaderText);
+
 	const pointMaterial = useMemo(
 		() => ({
 			uniforms: {
@@ -236,6 +240,21 @@ export const StarPoints = (props: StarPointProps) => {
 			attributes.size.needsUpdate = true;
 			tempHighlightIndex = null;
 		}
+
+		// Update highlight position
+		// if (props.highlightIndex != null) {
+		// 	const x = attributes.position.array[props.highlightIndex * 3];
+		// 	const y = attributes.position.array[props.highlightIndex * 3 + 1];
+		// 	const z = attributes.position.array[props.highlightIndex * 3 + 2];
+		// 	const tempVector = new THREE.Vector3(x, y, z);
+		// 	const screenPosition = vectorToScreenPosition(
+		// 		tempVector,
+		// 		camera,
+		// 		gl
+		// 	);
+		// 	props.setHighlightPosition(screenPosition);
+		// }
+
 		props.setHighlightIndex(tempHighlightIndex);
 	});
 

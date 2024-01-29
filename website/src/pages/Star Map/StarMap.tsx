@@ -15,6 +15,9 @@ import { StarPoints } from "./StarPoints";
 import { SolarSystem } from "./SolarSystem";
 import { TradeRoutes } from "./TradeRoutes";
 import { JSONStar, StarsClass } from "./data/Stars";
+import { updateCameraPosition } from "./threeJsUtils";
+import { vectorToScreenPosition } from "./utils";
+import { StarMapOverlay } from "./HUDOverlay";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -45,6 +48,15 @@ export interface StarsBufferAttributes {
 interface StarMapProps {
 	pointerPos: THREE.Vector2;
 	cameraControlsRef: React.MutableRefObject<any>;
+	setHighlightPosition: React.Dispatch<
+		React.SetStateAction<{ x: number; y: number } | null>
+	>;
+	selectedStar: JSONStar | null;
+	setSelectedStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
+	currentStar: JSONStar | null;
+	setCurrentStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
+	showStarMap: boolean;
+	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Main canvas
@@ -57,17 +69,38 @@ export const StarMap = (props: StarMapProps) => {
 	// Refs
 	const pointsRef = useRef<THREE.Points>(null);
 
-	// States
-	const [showStarMap, setShowStarMap] = useState<boolean>(false);
-
 	// Raycasting for Point Selection
 	const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
 	const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-	const [selectedStar, setSelectedStar] = useState<JSONStar | null>(null);
 
-	// const raycaster = new THREE.Raycaster();
-	// const camera = new THREE.PerspectiveCamera(0, 16 / 9, 0, 2000);
-	// const { raycaster, camera } = useThree();
+	useFrame(() => {
+		// Zoom to selected star
+		if (props.selectedStar === props.currentStar && props.currentStar) {
+			// props.cameraControlsRef.current.enabled = true;
+			const target = new THREE.Vector3(
+				props.currentStar.x * POSITION_MULTIPLIER,
+				props.currentStar.y * POSITION_MULTIPLIER,
+				props.currentStar.z * POSITION_MULTIPLIER
+			);
+			console.log("Selected star now null");
+			props.setSelectedStar(null);
+			moveCameraToStar(target, true);
+		}
+
+		if (props.selectedStar != null) {
+			const tempVector = new THREE.Vector3(
+				props.selectedStar.x * POSITION_MULTIPLIER,
+				props.selectedStar.y * POSITION_MULTIPLIER,
+				props.selectedStar.z * POSITION_MULTIPLIER
+			);
+			const screenPosition = vectorToScreenPosition(
+				tempVector,
+				camera,
+				gl
+			);
+			props.setHighlightPosition(screenPosition);
+		}
+	});
 
 	function onStarClick(e: ThreeEvent<MouseEvent>): void {
 		// Check if we clicked a point or a star mesh
@@ -90,16 +123,20 @@ export const StarMap = (props: StarMapProps) => {
 		const z = positions[highlightIndex * 3 + 2];
 
 		// Tween to new target
-		moveCameraToStar(x, y, z);
+		const target = new THREE.Vector3(x, y, z);
+		moveCameraToStar(target, false);
 
 		// Update the selected star
 
 		if (highlightIndex === selectedIndex) {
 			// Self explanatory...
-			setShowStarMap(false);
+			props.setShowStarMap(false);
 		}
 		const newStar = Stars[highlightIndex] as JSONStar;
-		setSelectedStar(newStar);
+		if (props.currentStar === null) {
+			props.setCurrentStar(newStar);
+		}
+		props.setSelectedStar(newStar);
 		setSelectedIndex(highlightIndex);
 
 		// Get nearest neighbours and show trade routes
@@ -111,51 +148,17 @@ export const StarMap = (props: StarMapProps) => {
 		if (lineDestinations) {
 			tradeDestinations.push(...lineDestinations);
 		}
-
-		// Move the text object and type out the selected star name
-		//@ts-ignore
-		// starName = props.starsBuffer.names[props.highlightIndex];
-		// console.log(starName);
-		// const newNameLabel = new CSS2
-		// starLabel.position.set(targetPos.x + 1, targetPos.y - 1, targetPos.z);
 	}
 
-	function updateCameraPosition(x: number, y: number, z: number): void {
-		const orbitControls = props.cameraControlsRef.current;
-		const oldPos = camera.position;
-		const targetPos = new THREE.Vector3(x, y, z);
-
-		if (orbitControls === null) return;
-
-		new TWEEN.Tween(orbitControls.target)
-			.to(targetPos, 2000)
-			.easing(TWEEN.Easing.Cubic.Out)
-			.start();
-
-		// Tween to new camera location
-		//   -  Point in-between old and new position
-		//
-		// Get unit vector
-		const unitVector = new THREE.Vector3();
-		unitVector.subVectors(oldPos, targetPos).normalize();
-		const newPos = new THREE.Vector3(
-			targetPos.x + unitVector.x * 10,
-			targetPos.y + unitVector.y * 10,
-			targetPos.z + unitVector.z * 10
+	function moveCameraToStar(target: THREE.Vector3, zoom: boolean): void {
+		updateCameraPosition(
+			target,
+			props.cameraControlsRef.current,
+			camera,
+			10,
+			2000,
+			zoom
 		);
-
-		new TWEEN.Tween(camera.position)
-			.to(newPos, 2500)
-			.easing(TWEEN.Easing.Cubic.Out)
-			.start();
-	}
-
-	function moveCameraToStar(x: number, y: number, z: number): void {
-		if (highlightIndex != selectedIndex) {
-			updateCameraPosition(x, y, z);
-		} else {
-			setShowStarMap(false);
-		}
 	}
 
 	const starsBuffer = useMemo(() => {
@@ -176,9 +179,6 @@ export const StarMap = (props: StarMapProps) => {
 			// Set position
 			// Work out what to do with the stars of unknown position
 			// as 0, 0, 0 should be where sol is
-			if (!Stars[i].x || !Stars[i].y || !Stars[i].z) {
-				console.log(i);
-			}
 			const x = Stars[i].x || 0;
 			const y = Stars[i].y || 0;
 			const z = Stars[i].z || 0;
@@ -225,21 +225,16 @@ export const StarMap = (props: StarMapProps) => {
 			sizes: bufferSizes,
 			index: bufferIndex,
 		};
-		// return new THREE.BufferAttribute(new Float32Array(starVertices), 3);
 	}, [Stars]);
 
 	return (
-		// <Canvas
-		// 	onMouseMove={(e) => {
-		// 		onMouseMoveEvent(e);
-		// 	}}
-		// >
 		<Suspense fallback={null}>
-			{!showStarMap && selectedStar != null ? (
+			{!props.showStarMap && props.currentStar != null ? (
 				<SolarSystem
-					starData={selectedStar}
-					setShowStarMap={setShowStarMap}
-					updateCameraPosition={updateCameraPosition}
+					starData={props.currentStar}
+					setShowStarMap={props.setShowStarMap}
+					cameraControls={props.cameraControlsRef.current}
+					// updateCameraPosition={updateCameraPosition}
 				/>
 			) : (
 				<>
@@ -248,8 +243,9 @@ export const StarMap = (props: StarMapProps) => {
 						pointerPos={props.pointerPos}
 						highlightIndex={highlightIndex}
 						setHighlightIndex={setHighlightIndex}
+						setHighlightPosition={props.setHighlightPosition}
 						cameraControlsRef={props.cameraControlsRef}
-						setShowStarMap={setShowStarMap}
+						setShowStarMap={props.setShowStarMap}
 						selectedIndex={selectedIndex}
 						setSelectedIndex={setSelectedIndex}
 						onClickEvent={onStarClick}
@@ -257,23 +253,21 @@ export const StarMap = (props: StarMapProps) => {
 					/>
 					<TradeRoutes
 						startPos={
-							selectedStar
+							props.selectedStar
 								? new THREE.Vector3(
-										selectedStar.x || 0,
-										selectedStar.y || 0,
-										selectedStar.z || 0
+										props.selectedStar.x || 0,
+										props.selectedStar.y || 0,
+										props.selectedStar.z || 0
 								  )
 								: new THREE.Vector3(0, 0, 0)
 						}
-						selectedStar={selectedStar}
+						selectedStar={props.selectedStar}
 						neighbours={[]}
 						endPos={tradeDestinations}
 					/>
 				</>
 			)}
 		</Suspense>
-
-		// </Canvas>
 	);
 };
 
@@ -298,7 +292,15 @@ const Ground = () => {
 
 export const StarMapCanvas = () => {
 	// Variables
+	// const { camera } = useThree();
 	const pointerPos = new THREE.Vector2();
+	const [
+		highlightedObjectScreenPosition,
+		setHighlightedObjectScreenPosition,
+	] = useState<{ x: number; y: number } | null>(null);
+	const [selectedStar, setSelectedStar] = useState<JSONStar | null>(null);
+	const [currentStar, setCurrentStar] = useState<JSONStar | null>(null);
+	const [showStarMap, setShowStarMap] = useState<boolean>(true);
 
 	const cameraControlsRef = useRef<any>(null);
 
@@ -321,38 +323,49 @@ export const StarMapCanvas = () => {
 				2 +
 			1;
 	}
-
-	const newCam = new THREE.PerspectiveCamera(
-		40,
-		window.innerWidth / window.innerHeight,
-		5000
-	);
-
 	return (
-		<Canvas
-			onMouseMove={(e) => {
-				onMouseMoveEvent(e);
-			}}
-			camera={{ near: 0.1, far: 10000.0 }}
-		>
-			<ambientLight intensity={1} />
-			<color attach={"background"} args={["black"]} />
-			<Ground />
-			<OrbitControls
-				ref={cameraControlsRef}
-				makeDefault
-				enablePan={true}
-				enableZoom={true}
-				enableRotate={true}
-				position={[0, 0, 0]}
-				minPolarAngle={0}
-				maxPolarAngle={Math.PI / 1.75}
+		<>
+			<StarMapOverlay
+				position={highlightedObjectScreenPosition}
+				selectedStar={selectedStar}
+				setSelectedStar={setSelectedStar}
+				currentStar={currentStar}
+				setCurrentStar={setCurrentStar}
+				showStarMap={showStarMap}
+				setShowStarMap={setShowStarMap}
 			/>
-			<Tween />
-			<StarMap
-				pointerPos={pointerPos}
-				cameraControlsRef={cameraControlsRef}
-			/>
-		</Canvas>
+			<Canvas
+				onMouseMove={(e) => {
+					onMouseMoveEvent(e);
+				}}
+				camera={{ near: 0.1, far: 10000.0 }}
+			>
+				<ambientLight intensity={1} />
+				<color attach={"background"} args={["black"]} />
+				<Ground />
+				<OrbitControls
+					ref={cameraControlsRef}
+					makeDefault
+					enablePan={true}
+					enableZoom={true}
+					enableRotate={true}
+					position={[0, 0, 0]}
+					minPolarAngle={0}
+					maxPolarAngle={Math.PI / 1.75}
+				/>
+				<Tween />
+				<StarMap
+					selectedStar={selectedStar}
+					setSelectedStar={setSelectedStar}
+					currentStar={currentStar}
+					setCurrentStar={setCurrentStar}
+					pointerPos={pointerPos}
+					setHighlightPosition={setHighlightedObjectScreenPosition}
+					cameraControlsRef={cameraControlsRef}
+					showStarMap={showStarMap}
+					setShowStarMap={setShowStarMap}
+				/>
+			</Canvas>
+		</>
 	);
 };
