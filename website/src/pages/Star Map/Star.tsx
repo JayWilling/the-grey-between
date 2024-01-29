@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { JSONStar } from "./data/Stars";
 import { Selection } from "@react-three/postprocessing";
 import { TestBloom } from "./BloomEffect";
+import { POSITION_MULTIPLIER } from "./StarMap";
 
 interface StarProps {
 	// meshProps: ThreeElements["mesh"];
@@ -18,9 +19,9 @@ export const Star = (props: StarProps) => {
 	let starPos = new THREE.Vector3(0, 0, 0);
 	if (props.data && props.data.x && props.data.y && props.data.z) {
 		starPos = new THREE.Vector3(
-			props.data.x * 3,
-			props.data.y * 3,
-			props.data.z * 3
+			props.data.x * POSITION_MULTIPLIER,
+			props.data.y * POSITION_MULTIPLIER,
+			props.data.z * POSITION_MULTIPLIER
 		);
 	}
 
@@ -34,12 +35,12 @@ export const Star = (props: StarProps) => {
 				onPointerOut={(event) => setHovered(false)}
 				position={starPos}
 			>
-				<pointLight position={starPos} intensity={1000} />
+				<pointLight intensity={5000} />
 				<sphereGeometry args={[5, 16, 16]} />
 				{/* <circleGeometry args={[3, 4]} /> */}
 				<meshStandardMaterial
 					emissive="red"
-					emissiveIntensity={5}
+					emissiveIntensity={10}
 					color={hovered ? "hotpink" : "orange"}
 				/>
 			</mesh>
