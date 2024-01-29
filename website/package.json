@@ -1,6 +1,6 @@
 {
   "name": "the-grey-between",
-  "homepage": "https://jaywilling.github.io/the-grey-between/website",
+  "homepage": "https://jaywilling.github.io/the-grey-between/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@tweenjs/tween.js": "^21.0.0",
     "@types/three": "^0.160.0",
+    "bootstrap": "^5.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0",
