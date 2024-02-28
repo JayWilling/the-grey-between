@@ -41,6 +41,14 @@ export const Sidebar = () => {
 					>
 						Star Map
 					</NavLink>
+					<NavLink
+						className={({ isActive }) =>
+							sidebarItemClassName(isActive)
+						}
+						to="/pointsofinterest"
+					>
+						Points of Interest
+					</NavLink>
 				</div>
 			</div>
 		</div>

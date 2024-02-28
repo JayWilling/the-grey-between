@@ -1,12 +1,17 @@
 .sidebar {
-    position: absolute;
+    position: sticky;
+    position: -webkit-sticky;
+    top: var(--headerHeight);
     height: calc(100vh - var(--headerHeight));
+    /* height: 100%; */
 }
 
 .sidebar-container {
     height: 100%;
     width: 20vw;
-    position: relative;
+    position: absolute;
+    /* right: 100%; */
+    /* left: 100%; */
     background-color: black;
     color: white;
     transition: all 0.3s ease-in-out;
@@ -15,11 +20,13 @@
 }
 
 .sidebar-container.collapsed {
-    right: 100%;
+    right: 20vw;
+    /* left: 100%; */
 }
 
 .sidebar-container.expanded {
-    right: 0%;
+    right: -20vw;
+    /* left: 0; */
 }
 
 .sidebar-btn {
@@ -44,7 +51,6 @@
 .sidebar-content {
     display: flex;
     flex-direction: column;
-    position: absolute;
     color: white;
     padding-left: 130px;
     width: 100%;
@@ -53,21 +59,23 @@
     transition: all 0.3s ease 0s;
 }
 
-.sidebar-container.collapsed .sidebar-content {
+/* .sidebar-container.collapsed .sidebar-content {
     width: 0%;
-}
+} */
 
 .sidebar-item {
     display: flex;
     align-items: center;
     justify-content:flex-start;
     flex-direction: row;
-    width: 100%;
+    width: calc(100% - 20px);
     color: white  ;
     text-decoration: none;
     background-color: transparent;
     transition: all 0.3s ease 0s;
 
+    margin-right: 20px;
+    padding-left: 20px;
     padding-top: 20px;
     padding-bottom: 20px;
     /* margin-right: 5vw;

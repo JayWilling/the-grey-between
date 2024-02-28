@@ -1,7 +1,7 @@
 import { Line } from "@react-three/drei";
 import React from "react";
 import * as THREE from "three";
-import { JSONStar } from "./data/Stars";
+import { JSONStar } from "../../assets/data/Stars";
 
 interface TradeRoutesProps {
 	selectedStar: JSONStar | null;

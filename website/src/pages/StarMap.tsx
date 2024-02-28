@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import "./StarMap.css";
+import "./../assets/styling/StarMap.css";
 
 import * as THREE from "three";
 import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
@@ -10,14 +10,15 @@ import {
 	useBounds,
 } from "@react-three/drei";
 import TWEEN from "@tweenjs/tween.js";
-import Stars from "./data/bsc5p_3d.json";
-import { StarPoints } from "./StarPoints";
-import { SolarSystem } from "./SolarSystem";
-import { TradeRoutes } from "./TradeRoutes";
-import { JSONStar, StarsClass } from "./data/Stars";
-import { updateCameraPosition } from "./threeJsUtils";
-import { vectorToScreenPosition } from "./utils";
-import { StarMapOverlay } from "./HUDOverlay";
+import Stars from "../assets/data/bsc5p_3d.json";
+import { StarPoints } from "../components/threeJs/StarPoints";
+import { SolarSystem } from "../components/threeJs/SolarSystem/SolarSystem";
+import { TradeRoutes } from "../components/threeJs/TradeRoutes";
+import { JSONStar, StarsClass } from "../assets/data/Stars";
+import { updateCameraPosition } from "../threeJsUtils";
+import { vectorToScreenPosition } from "../utils";
+import { StarMapOverlay } from "../components/overlay/HUDOverlay";
+import { OverlayState } from "../interfaces";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -57,7 +58,13 @@ interface StarMapProps {
 	setCurrentStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
 	showStarMap: boolean;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
+	setOverlayState: React.Dispatch<React.SetStateAction<OverlayState>>;
 }
+
+type HtmlElementInterface =
+	| HTMLDivElement
+	| HTMLButtonElement
+	| HTMLFormElement;
 
 // Main canvas
 export const StarMap = (props: StarMapProps) => {
@@ -131,6 +138,7 @@ export const StarMap = (props: StarMapProps) => {
 		if (highlightIndex === selectedIndex) {
 			// Self explanatory...
 			props.setShowStarMap(false);
+			props.setOverlayState(OverlayState.SolarSystem);
 		}
 		const newStar = Stars[highlightIndex] as JSONStar;
 		if (props.currentStar === null) {
@@ -301,6 +309,9 @@ export const StarMapCanvas = () => {
 	const [selectedStar, setSelectedStar] = useState<JSONStar | null>(null);
 	const [currentStar, setCurrentStar] = useState<JSONStar | null>(null);
 	const [showStarMap, setShowStarMap] = useState<boolean>(true);
+	const [overlayState, setOverlayState] = useState<OverlayState>(
+		OverlayState.StarMap
+	);
 
 	const cameraControlsRef = useRef<any>(null);
 
@@ -323,6 +334,36 @@ export const StarMapCanvas = () => {
 				2 +
 			1;
 	}
+
+	function updateOverlayState(
+		e: React.MouseEvent<HTMLElement>,
+		state: OverlayState
+	) {
+		e.preventDefault();
+		switch (state) {
+			case OverlayState.SolarSystem:
+				setShowStarMap(false);
+				setOverlayState(state);
+				return;
+			case OverlayState.StarMap:
+				setShowStarMap(true);
+				setOverlayState(state);
+				return;
+			case OverlayState.CreateCB:
+				if (currentStar != null) {
+					setOverlayState(state);
+				} else {
+					alert("Navigate to a system to start creating.");
+				}
+				return;
+			case OverlayState.Story:
+			default:
+				alert(
+					"Missing case for OverlayState: " + state + " in StarMap."
+				);
+		}
+	}
+
 	return (
 		<>
 			<StarMapOverlay
@@ -333,6 +374,9 @@ export const StarMapCanvas = () => {
 				setCurrentStar={setCurrentStar}
 				showStarMap={showStarMap}
 				setShowStarMap={setShowStarMap}
+				overlayState={overlayState}
+				setOverlayState={setOverlayState}
+				updateOverlayState={updateOverlayState}
 			/>
 			<Canvas
 				onMouseMove={(e) => {
@@ -364,6 +408,7 @@ export const StarMapCanvas = () => {
 					cameraControlsRef={cameraControlsRef}
 					showStarMap={showStarMap}
 					setShowStarMap={setShowStarMap}
+					setOverlayState={setOverlayState}
 				/>
 			</Canvas>
 		</>

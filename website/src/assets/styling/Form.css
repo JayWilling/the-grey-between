@@ -1,0 +1,50 @@
+.starmapOverlay .form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: #343943;
+    color: white;
+    border-radius: 5px;
+    transition: all 0.6s ease-in-out;
+    z-index: 10;
+    pointer-events: all;
+}
+
+.contextMenuAddTopic {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-evenly;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.contextMenuAddTopic .inputField input {
+    width: 100%;
+    font-size: 15px;
+    border-radius: 20px;
+    background-color: var(--headerColour);
+    border-color: var(--headerColour);
+    color: white;
+}
+
+.contextMenuAddTopic .buttonField {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    border-color: var(--headerColour);
+}
+
+.contextMenuAddTopic .buttonField button {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 20%;
+    height: 80px;
+    border-radius: 20px;
+    background-color: var(--headerColour);
+    border-color: var(--headerColour);
+    color: white;
+    font-size: 16px;
+    margin: 20px;
+}

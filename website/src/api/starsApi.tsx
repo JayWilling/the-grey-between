@@ -1,6 +1,6 @@
 import { Params } from "react-router-dom";
-import { CelestialBody } from "./CelestialBody";
-import { Planet } from "./Planet";
+import { CelestialBody } from "../components/threeJs/Objects/CelestialBody";
+import { Planet } from "../components/threeJs/Planet";
 
 export const BASE_URL = `http://localhost:5000/`;
 

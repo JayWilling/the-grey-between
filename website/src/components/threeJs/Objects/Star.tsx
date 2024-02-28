@@ -1,10 +1,10 @@
 import { ThreeElements, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import * as THREE from "three";
-import { JSONStar } from "./data/Stars";
+import { JSONStar } from "../../../assets/data/Stars";
 import { Selection } from "@react-three/postprocessing";
-import { TestBloom } from "./BloomEffect";
-import { POSITION_MULTIPLIER } from "./StarMap";
+import { TestBloom } from "../../../effects/BloomEffect";
+import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
 
 interface StarProps {
 	// meshProps: ThreeElements["mesh"];

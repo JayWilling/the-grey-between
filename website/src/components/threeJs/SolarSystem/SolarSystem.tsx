@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-import { JSONStar } from "./data/Stars";
-import { Star } from "./Star";
-import { Planet } from "./Planet";
+import { JSONStar } from "../../../assets/data/Stars";
+import { Star } from "../Objects/Star";
+import { Planet } from "../Planet";
 import { ThreeEvent, useFrame, useLoader, useThree } from "@react-three/fiber";
-import { POSITION_MULTIPLIER } from "./StarMap";
-import { updateCameraPosition } from "./threeJsUtils";
+import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
+import { updateCameraPosition } from "../../../threeJsUtils";
 import { useParams } from "react-router-dom";
 import {
 	CBProps,
@@ -14,7 +14,8 @@ import {
 	CelestialBody,
 	FunctionalCelestialBody,
 	getPlanetPosition,
-} from "./CelestialBody";
+} from "../Objects/CelestialBody";
+import { Sphere } from "@react-three/drei";
 // import { Points } from "@react-three/drei";
 
 interface SolarSystemProps {
@@ -106,6 +107,9 @@ const GravityWarp = (props: FabricProps) => {
 			let cbRipples = 0;
 			for (let k = 0; k < props.celestialBodies.length; k++) {
 				const planet = props.celestialBodies[k];
+				if (planet.starParent == null) {
+					return 0;
+				}
 				const { x, z } = getPlanetPosition(
 					planet.starParent.x,
 					planet.starParent.z,
@@ -219,54 +223,10 @@ const GravityWarp = (props: FabricProps) => {
 };
 
 export const SolarSystem = (props: SolarSystemProps) => {
-	const { camera } = useThree();
-	// const params = useParams();
-
-	// Planet list
-
-	// let centre = {
-	// 	x: 0,
-	// 	y: 0,
-	// 	z: 0,
-	// };
-	// if (props.starData) {
-	// 	centre = {
-	// 		x: props.starData.x || 0,
-	// 		y: props.starData.y || 0,
-	// 		z: props.starData.z || 0,
-	// 	};
-	// }
-
-	// const [cameraTargetPosition, setCameraTargetPosition] = useState<{ x: number; y: number; z: number }>({
-	// 				x: props.starData.x,
-	// 				y: props.starData.y,
-	// 				z: props.starData.z,
-	// 			}
-	// );
-
-	// useFrame((state, delta) => {
-	// 	// Handle planet orbits
-	// 	for (let i = 0; i < planetList.length; i++) {
-	// 		if (planetList[i].componentDidMount) {
-	// 			planetList[i].updatePosition(delta);
-	// 		}
-	// 	}
-	// });
+	const { camera, raycaster } = useThree();
+	const newCBRef = useRef<THREE.Mesh | null>(null);
 
 	function onCelestialBodyClick(e: ThreeEvent<MouseEvent>) {
-		// Get the position of the object
-		// Update the centre position
-		// centre = {
-		// 	x: e.eventObject.position.x,
-		// 	y: e.eventObject.position.y,
-		// 	z: e.eventObject.position.z,
-		// };
-		// setCameraTargetPosition({
-		// 	x: e.eventObject.position.x,
-		// 	y: e.eventObject.position.y,
-		// 	z: e.eventObject.position.z,
-		// });
-
 		// Move the camera
 		const target = new THREE.Vector3(
 			e.eventObject.position.x,
@@ -281,8 +241,6 @@ export const SolarSystem = (props: SolarSystemProps) => {
 	// Setup a fake list of planets for the star
 	//      This will later be fetched from the back-end
 	//      Start with 5 planets
-
-	// const planetList: CelestialBody[] = [];
 
 	const planetList: CBProps[] = useMemo(() => {
 		const tempPlanetList = [];
@@ -303,21 +261,23 @@ export const SolarSystem = (props: SolarSystemProps) => {
 				position: position,
 			};
 
-			// const newPlanet = new CelestialBody(tempProps);
-
 			tempPlanetList.push(tempProps);
-			// tempPlanetList.push(newPlanet);
 		}
 		return tempPlanetList;
 	}, []);
 
-	// useEffect(() => {
-	// });
+	useFrame(() => {
+		// Define a raycaster to determine where to place a new celestial body when clicking
+		// raycaster.intersectObjects;
+		// Cast from mouse screen pos
+		// Intersect with plane at the height of star
+	});
 
 	// We will then map the planets to be displayed
 
 	return (
 		<group>
+			{/* <Sphere ref={newCBRef} position={} /> */}
 			<Star
 				onClick={() => {
 					props.setShowStarMap(true);
@@ -335,7 +295,6 @@ export const SolarSystem = (props: SolarSystemProps) => {
 				]}
 			/>
 			{planetList.map((body, index) => {
-				// return <group key={index}>{body.render()}</group>;
 				return <FunctionalCelestialBody key={index} {...body} />;
 			})}
 			<GravityWarp

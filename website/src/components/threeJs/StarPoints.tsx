@@ -1,17 +1,20 @@
 import React, { useMemo, useRef } from "react";
-import "./StarMap.css";
+import "./../../assets/styling/StarMap.css";
 
 import * as THREE from "three";
 import { useFrame, useThree, useLoader, ThreeEvent } from "@react-three/fiber";
-import Stars from "./data/bsc5p_3d.json";
+import Stars from "../../assets/data/bsc5p_3d.json";
 import { Selection } from "@react-three/postprocessing";
 import { Circle, Text } from "@react-three/drei";
-import { StarsBufferAttributes } from "./StarMap";
-import { TestBloom } from "./BloomEffect";
+import { StarsBufferAttributes } from "../../pages/StarMap";
+import { TestBloom } from "../../effects/BloomEffect";
 // import vertexShaderText from "./shaders/bloomVertexShader.vs.glsl";
 // import fragmentShaderText from "./shaders/bloomFragmentShader.fs.glsl";
-import { LensFlareEffect, LensFlareParams } from "./shaders/lensFlareTemp.js";
-import { objectToScreenPosition, vectorToScreenPosition } from "./utils";
+import {
+	LensFlareEffect,
+	LensFlareParams,
+} from "../../assets/shaders/lensFlareTemp.js";
+import { objectToScreenPosition, vectorToScreenPosition } from "../../utils";
 
 interface StarPointProps {
 	starsBuffer: StarsBufferAttributes;

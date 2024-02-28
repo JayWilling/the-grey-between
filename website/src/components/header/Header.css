@@ -1,4 +1,6 @@
 .header-container {
+    position: sticky;
+    top: 0px;
     background-color: var(--headerColour);
     /* min-height: 100vh; */
     min-height: var(--headerHeight);

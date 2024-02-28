@@ -2,9 +2,9 @@ import { MeshProps, ThreeElements, useFrame } from "@react-three/fiber";
 import React, { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Object3D } from "three";
-import { JSONStar } from "./data/Stars";
+import { JSONStar } from "../../../assets/data/Stars";
 import { Line, Trail } from "@react-three/drei";
-import { POSITION_MULTIPLIER } from "./StarMap";
+import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
 
 type CelestialBodyType = "Planet" | "Moon" | "Asteroid" | "AsteroidBelt";
 
@@ -19,7 +19,7 @@ export interface CelestialBodyI {
 export interface CBProps extends MeshProps {
 	name: string;
 	description: string;
-	starParent: JSONStar;
+	starParent: JSONStar | null;
 	radius: number;
 	orbitRadius: number;
 	orbitVelocity: number;
@@ -29,7 +29,7 @@ export interface CBProps extends MeshProps {
 export interface CBState {
 	name: string;
 	description: string;
-	parent: JSONStar;
+	parent: JSONStar | null;
 	radius: number;
 	orbitRadius: number;
 	colour: string;
@@ -58,6 +58,9 @@ export class CelestialBody extends React.Component<CBProps, CBState> {
 	}
 
 	updatePosition(time: number) {
+		if (this.state.parent == null) {
+			return;
+		}
 		const x = this.state.parent.x + this.state.orbitRadius * Math.cos(time);
 		const z = this.state.parent.z + this.state.orbitRadius * Math.sin(time);
 		console.log(x);
@@ -186,6 +189,11 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 
 		// const x = props.starParent.x + props.orbitRadius * Math.sin(t);
 		// const z = props.starParent.z + props.orbitRadius * Math.cos(t);
+
+		if (props.starParent == null) {
+			return;
+		}
+
 		const { x, z } = getPlanetPosition(
 			props.starParent.x * POSITION_MULTIPLIER,
 			props.starParent.z * POSITION_MULTIPLIER,
@@ -228,11 +236,15 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 				color="turquoise"
 				lineWidth={0.1}
 				rotation={new THREE.Euler(0.5 * Math.PI, 0, 0)}
-				position={[
-					props.starParent.x * POSITION_MULTIPLIER,
-					props.starParent.y * POSITION_MULTIPLIER,
-					props.starParent.z * POSITION_MULTIPLIER,
-				]}
+				position={
+					props.starParent != null
+						? [
+								props.starParent.x * POSITION_MULTIPLIER,
+								props.starParent.y * POSITION_MULTIPLIER,
+								props.starParent.z * POSITION_MULTIPLIER,
+						  ]
+						: [0, 0, 0]
+				}
 			/>
 		</group>
 	);

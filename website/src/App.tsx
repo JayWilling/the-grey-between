@@ -10,7 +10,8 @@ import { Sidebar } from "./components/sidebar/Sidebar";
 
 //Pages
 import { Home } from "./pages/Home";
-import { StarMapCanvas } from "./pages/Star Map/StarMap";
+import { StarMapCanvas } from "./pages/StarMap";
+import { PointsOfInterest } from "./pages/PointsOfInterest";
 
 function App() {
 	return (
@@ -22,6 +23,10 @@ function App() {
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/starmap" element={<StarMapCanvas />} />
+						<Route
+							path="/pointsofinterest"
+							element={<PointsOfInterest />}
+						/>
 					</Routes>
 				</div>
 			</div>
