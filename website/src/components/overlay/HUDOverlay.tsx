@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import { JSONStar } from "../../assets/data/Stars";
-import { OverlayState } from "../../interfaces";
+import { JSONStar, OverlayState } from "../../interfaces";
 import { CelestialBodyForm } from "./CelestialBodyForm";
 import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
 import { SolarSystemStarMenu } from "./StarMenu/SolarSystemStarMenu";

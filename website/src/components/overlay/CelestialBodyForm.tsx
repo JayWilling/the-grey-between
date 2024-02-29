@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { OverlayState } from "../../interfaces";
+import { CBProps, OverlayState } from "../../interfaces";
 import "./../../assets/styling/Form.css";
 import { CanvasOverlayProps } from "./HUDOverlay";
-import { CBProps } from "../threeJs/Objects/CelestialBody";
 
 export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 	const [celestialBodyValues, setCelestialBodyValues] = useState<CBProps>({

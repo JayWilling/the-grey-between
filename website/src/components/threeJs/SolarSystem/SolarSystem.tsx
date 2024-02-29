@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-import { JSONStar } from "../../../assets/data/Stars";
 import { Star } from "../Objects/Star";
 import { Planet } from "../Planet";
 import { ThreeEvent, useFrame, useLoader, useThree } from "@react-three/fiber";
@@ -9,13 +8,12 @@ import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
 import { updateCameraPosition } from "../../../threeJsUtils";
 import { useParams } from "react-router-dom";
 import {
-	CBProps,
-	CBState,
 	CelestialBody,
 	FunctionalCelestialBody,
 	getPlanetPosition,
 } from "../Objects/CelestialBody";
 import { Sphere } from "@react-three/drei";
+import { CBProps, JSONStar } from "../../../interfaces";
 // import { Points } from "@react-three/drei";
 
 interface SolarSystemProps {

@@ -14,11 +14,10 @@ import Stars from "../assets/data/bsc5p_3d.json";
 import { StarPoints } from "../components/threeJs/StarPoints";
 import { SolarSystem } from "../components/threeJs/SolarSystem/SolarSystem";
 import { TradeRoutes } from "../components/threeJs/TradeRoutes";
-import { JSONStar, StarsClass } from "../assets/data/Stars";
 import { updateCameraPosition } from "../threeJsUtils";
 import { vectorToScreenPosition } from "../utils";
 import { StarMapOverlay } from "../components/overlay/HUDOverlay";
-import { OverlayState } from "../interfaces";
+import { JSONStar, OverlayState } from "../interfaces";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -70,7 +69,7 @@ type HtmlElementInterface =
 export const StarMap = (props: StarMapProps) => {
 	const { gl, scene, raycaster, camera } = useThree();
 
-	const testStars = new StarsClass(Stars as JSONStar[]);
+	// const testStars = new StarsClass(Stars as JSONStar[]);
 	const tradeDestinations: THREE.Vector3[] = [];
 
 	// Refs
@@ -148,14 +147,14 @@ export const StarMap = (props: StarMapProps) => {
 		setSelectedIndex(highlightIndex);
 
 		// Get nearest neighbours and show trade routes
-		const lineDestinations = testStars.getNearestNeighbours(
-			highlightIndex,
-			10,
-			true
-		);
-		if (lineDestinations) {
-			tradeDestinations.push(...lineDestinations);
-		}
+		// const lineDestinations = testStars.getNearestNeighbours(
+		// 	highlightIndex,
+		// 	10,
+		// 	true
+		// );
+		// if (lineDestinations) {
+		// 	tradeDestinations.push(...lineDestinations);
+		// }
 	}
 
 	function moveCameraToStar(target: THREE.Vector3, zoom: boolean): void {

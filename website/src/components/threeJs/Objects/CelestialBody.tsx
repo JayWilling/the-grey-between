@@ -2,41 +2,11 @@ import { MeshProps, ThreeElements, useFrame } from "@react-three/fiber";
 import React, { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Object3D } from "three";
-import { JSONStar } from "../../../assets/data/Stars";
 import { Line, Trail } from "@react-three/drei";
 import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
+import { CBProps, CBState } from "../../../interfaces";
 
 type CelestialBodyType = "Planet" | "Moon" | "Asteroid" | "AsteroidBelt";
-
-export interface CelestialBodyI {
-	name: string;
-	description: string;
-	radius: number;
-	orbitRadius: number;
-	colour: string;
-}
-
-export interface CBProps extends MeshProps {
-	name: string;
-	description: string;
-	starParent: JSONStar | null;
-	radius: number;
-	orbitRadius: number;
-	orbitVelocity: number;
-	colour: string;
-}
-
-export interface CBState {
-	name: string;
-	description: string;
-	parent: JSONStar | null;
-	radius: number;
-	orbitRadius: number;
-	colour: string;
-	hovered: boolean;
-	selected: boolean;
-	position: [number, number, number];
-}
 
 export class CelestialBody extends React.Component<CBProps, CBState> {
 	constructor(props: CBProps) {
