@@ -10,14 +10,17 @@ import {
 	useBounds,
 } from "@react-three/drei";
 import TWEEN from "@tweenjs/tween.js";
-import Stars from "../assets/data/bsc5p_3d.json";
+// import Stars from "../assets/data/bsc5p_3d.json";
 import { StarPoints } from "../components/threeJs/StarPoints";
 import { SolarSystem } from "../components/threeJs/SolarSystem/SolarSystem";
 import { TradeRoutes } from "../components/threeJs/TradeRoutes";
 import { updateCameraPosition } from "../threeJsUtils";
-import { vectorToScreenPosition } from "../utils";
+import { graphToJson, jsonToGraph, vectorToScreenPosition } from "../utils";
 import { StarMapOverlay } from "../components/overlay/HUDOverlay";
 import { JSONStar, OverlayState } from "../interfaces";
+import { Star } from "../assets/data/Star";
+import { getStars, onNewNode, onUploadStarList } from "../api/starsApi";
+import { UniverseGraph, Node } from "../assets/data/UniverseGraph";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -51,10 +54,10 @@ interface StarMapProps {
 	setHighlightPosition: React.Dispatch<
 		React.SetStateAction<{ x: number; y: number } | null>
 	>;
-	selectedStar: JSONStar | null;
-	setSelectedStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
-	currentStar: JSONStar | null;
-	setCurrentStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
+	selectedStar: Star | null;
+	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
+	currentStar: Star | null;
+	setCurrentStar: React.Dispatch<React.SetStateAction<Star | null>>;
 	showStarMap: boolean;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 	setOverlayState: React.Dispatch<React.SetStateAction<OverlayState>>;
@@ -69,6 +72,7 @@ type HtmlElementInterface =
 export const StarMap = (props: StarMapProps) => {
 	const { gl, scene, raycaster, camera } = useThree();
 
+	const [Stars, setStars] = useState<Star[]>([]);
 	// const testStars = new StarsClass(Stars as JSONStar[]);
 	const tradeDestinations: THREE.Vector3[] = [];
 
@@ -78,6 +82,39 @@ export const StarMap = (props: StarMapProps) => {
 	// Raycasting for Point Selection
 	const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
 	const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+	// Converting JSON to graph structure
+	// let starGraph = null;
+	// if (Stars) {
+	// 	starGraph = jsonToGraph(Stars as Star[]);
+	// }
+
+	// const starClassList: Star[] = [];
+	// for (let i = 0; i < Stars.length; i++) {
+	// 	var newStar = new Star((Stars as JSONStar[])[i]);
+
+	// 	starClassList.push(newStar);
+	// }
+
+	// console.log(Stars as Star[]);
+
+	// console.log(starGraph);
+
+	// onNewNode(new Node<Star>((Stars as Star[])[0], () => 0));
+	// if (starGraph != null) {
+	// 	graphToJson(starGraph);
+	// }
+
+	useEffect(() => {
+		// Load base star list
+		const promise = getStars();
+		promise.then((response) => {
+			if (response == null) return;
+			// Stars = response;
+			setStars(response);
+			console.log(Stars);
+		});
+	}, []);
 
 	useFrame(() => {
 		// Zoom to selected star
@@ -139,7 +176,7 @@ export const StarMap = (props: StarMapProps) => {
 			props.setShowStarMap(false);
 			props.setOverlayState(OverlayState.SolarSystem);
 		}
-		const newStar = Stars[highlightIndex] as JSONStar;
+		const newStar = Stars[highlightIndex] as Star;
 		if (props.currentStar === null) {
 			props.setCurrentStar(newStar);
 		}
@@ -178,7 +215,8 @@ export const StarMap = (props: StarMapProps) => {
 
 		for (var i = 0; i < Stars.length; i++) {
 			// Set name
-			starNames.push(Stars[i].n);
+			const name = Stars[i].n;
+			name ? starNames.push(name) : starNames.push("");
 
 			// Push Star index
 			starIndex.push(i);
@@ -233,6 +271,10 @@ export const StarMap = (props: StarMapProps) => {
 			index: bufferIndex,
 		};
 	}, [Stars]);
+
+	if (Stars.length <= 0) {
+		return <>Loading</>;
+	}
 
 	return (
 		<Suspense fallback={null}>
@@ -305,8 +347,8 @@ export const StarMapCanvas = () => {
 		highlightedObjectScreenPosition,
 		setHighlightedObjectScreenPosition,
 	] = useState<{ x: number; y: number } | null>(null);
-	const [selectedStar, setSelectedStar] = useState<JSONStar | null>(null);
-	const [currentStar, setCurrentStar] = useState<JSONStar | null>(null);
+	const [selectedStar, setSelectedStar] = useState<Star | null>(null);
+	const [currentStar, setCurrentStar] = useState<Star | null>(null);
 	const [showStarMap, setShowStarMap] = useState<boolean>(true);
 	const [overlayState, setOverlayState] = useState<OverlayState>(
 		OverlayState.StarMap
