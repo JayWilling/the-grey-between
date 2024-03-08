@@ -4,27 +4,27 @@ import { JSONStar, RGBColours } from "../../interfaces";
 
 // Interfaces & Types
 
-export class Star {
-	index: number;
-	name: string;
-	x: number;
-	y: number;
-	z: number;
-	colour: RGBColours;
+// export class Star {
+// 	index: number;
+// 	name: string;
+// 	x: number;
+// 	y: number;
+// 	z: number;
+// 	colour: RGBColours;
 
-	constructor(starData: JSONStar) {
-		this.index = starData.i;
-		this.name = starData.n ? starData.n : "";
-		this.x = starData.x;
-		this.y = starData.y;
-		this.z = starData.z;
-		if (starData.K) {
-			this.colour = { r: starData.K.r, g: starData.K.g, b: starData.K.b };
-		} else {
-			this.colour = { r: 1, g: 1, b: 1 };
-		}
-	}
-}
+// 	constructor(starData: JSONStar) {
+// 		this.index = starData.i;
+// 		this.name = starData.n ? starData.n : "";
+// 		this.x = starData.x;
+// 		this.y = starData.y;
+// 		this.z = starData.z;
+// 		if (starData.K) {
+// 			this.colour = { r: starData.K.r, g: starData.K.g, b: starData.K.b };
+// 		} else {
+// 			this.colour = { r: 1, g: 1, b: 1 };
+// 		}
+// 	}
+// }
 
 // export class StarsClass {
 // 	private _starList: JSONStar[];

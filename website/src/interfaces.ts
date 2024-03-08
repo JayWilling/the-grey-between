@@ -1,4 +1,5 @@
 import { MeshProps } from "@react-three/fiber";
+import { Star } from "./assets/data/Star";
 
 export interface tempInterface {
     test: string;
@@ -26,6 +27,8 @@ export interface CelestialBodyNode {
 
 }
 
+
+// An intermediary interface for converting JSON data into corresponding classes
 export interface JSONStar extends SharedArrayBuffer {
 	i: number;
 	n: string | null;
@@ -43,6 +46,13 @@ export interface RGBColours {
 	b: number;
 }
 
+export enum CBType {
+    Planet,
+    Asteroid,
+    Belt,
+    Ship
+}
+
 export interface CelestialBodyI {
 	name: string;
 	description: string;
@@ -54,7 +64,7 @@ export interface CelestialBodyI {
 export interface CBProps extends MeshProps {
 	name: string;
 	description: string;
-	starParent: JSONStar | null;
+	starParent: Star | null;
 	radius: number;
 	orbitRadius: number;
 	orbitVelocity: number;

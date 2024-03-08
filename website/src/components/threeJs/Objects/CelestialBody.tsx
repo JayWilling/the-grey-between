@@ -4,78 +4,77 @@ import * as THREE from "three";
 import { Object3D } from "three";
 import { Line, Trail } from "@react-three/drei";
 import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
-import { CBProps, CBState } from "../../../interfaces";
+import { CBProps, CBState, JSONStar } from "../../../interfaces";
 
-type CelestialBodyType = "Planet" | "Moon" | "Asteroid" | "AsteroidBelt";
+// Celestial body's can be generated either from the base data (in the format of JSONStar)
+// or from CBProps themselves (Submitted through the form).
+// However, we are unable to have dynamic type checks at runtime for interfaces thanks
+// to JavaScript. As such we need some ugly member checks before using any of the data
+// within the constructor.
 
-export class CelestialBody extends React.Component<CBProps, CBState> {
-	constructor(props: CBProps) {
-		super(props);
-
-		// Set the state
-		this.state = {
-			name: this.props.name,
-			description: this.props.description,
-			parent: this.props.starParent,
-			radius: this.props.radius,
-			orbitRadius: this.props.orbitRadius,
-			colour: this.props.colour,
-			hovered: false,
-			selected: false,
-			// @ts-ignore
-			position: this.props.position,
-		};
+export class CelestialBody {
+	// name: String;
+	// description: String;
+	constructor(props: CBProps | JSONStar) {
+		// Rules:
+		//
+		//      If parent is null, position is relative
+		//
+		// if (typeof props === "CBProps") {
+		// }
+		// this.name = props.name;
+		// this.description = props.description;
 	}
 
 	updatePosition(time: number) {
-		if (this.state.parent == null) {
-			return;
-		}
-		const x = this.state.parent.x + this.state.orbitRadius * Math.cos(time);
-		const z = this.state.parent.z + this.state.orbitRadius * Math.sin(time);
-		console.log(x);
-		this.setState({
-			...this.state,
-			position: [x, this.state.parent.y, z],
-		});
-	}
-
-	render() {
-		// useFrame((state, delta) => {
-		// 	const x = Math.sqrt(
-		// 		this.state.orbitRadius -
-		// 			Math.pow(this.state.parent.y + delta, 2)
-		// 	);
-		// 	const y = Math.sqrt(
-		// 		this.state.orbitRadius - Math.pow(this.state.parent.x, 2)
-		// 	);
-		// 	const z = Math.sqrt(this.state.parent.z);
-		// 	this.setState({ ...this.state, position: [x, y, z] });
+		// if (this.state.parent == null) {
+		// 	return;
+		// }
+		// const x = this.state.parent.x + this.state.orbitRadius * Math.cos(time);
+		// const z = this.state.parent.z + this.state.orbitRadius * Math.sin(time);
+		// console.log(x);
+		// this.setState({
+		// 	...this.state,
+		// 	position: [x, this.state.parent.y, z],
 		// });
-
-		return (
-			<mesh position={this.props.position}>
-				<sphereGeometry args={[1, 16, 16]} />
-				<meshStandardMaterial
-					color={this.state.hovered ? "hotpink" : "green"}
-				/>
-				{/* <CelestialBodyFrameLogic
-					state={this.state}
-					setState={this.setState}
-				/> */}
-			</mesh>
-		);
 	}
 
-	toJSON() {
-		return {
-			name: this.state.name,
-			description: this.state.description,
-			radius: this.state.radius,
-			orbitRadius: this.state.orbitRadius,
-			colour: this.state.colour,
-		};
-	}
+	// render() {
+	// 	// useFrame((state, delta) => {
+	// 	// 	const x = Math.sqrt(
+	// 	// 		this.state.orbitRadius -
+	// 	// 			Math.pow(this.state.parent.y + delta, 2)
+	// 	// 	);
+	// 	// 	const y = Math.sqrt(
+	// 	// 		this.state.orbitRadius - Math.pow(this.state.parent.x, 2)
+	// 	// 	);
+	// 	// 	const z = Math.sqrt(this.state.parent.z);
+	// 	// 	this.setState({ ...this.state, position: [x, y, z] });
+	// 	// });
+
+	// 	return (
+	// 		<mesh position={this.props.position}>
+	// 			<sphereGeometry args={[1, 16, 16]} />
+	// 			<meshStandardMaterial
+	// 				color={this.state.hovered ? "hotpink" : "green"}
+	// 			/>
+	// 			{/* <CelestialBodyFrameLogic
+	// 				state={this.state}
+	// 				setState={this.setState}
+	// 			/> */}
+	// 		</mesh>
+	// 	);
+	// }
+
+	// toJSON() {
+	// 	return {
+	// 		name: this.state.name,
+	// 		description: this.state.description,
+	// 		radius: this.state.radius,
+	// 		orbitRadius: this.state.orbitRadius,
+	// 		colour: this.state.colour,
+	// 	};
+	// }
 }
 
 // interface LogicProps {

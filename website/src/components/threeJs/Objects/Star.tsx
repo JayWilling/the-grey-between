@@ -1,18 +1,19 @@
 import { ThreeElements, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import * as THREE from "three";
-import { JSONStar } from "../../../assets/data/Stars";
 import { Selection } from "@react-three/postprocessing";
 import { TestBloom } from "../../../effects/BloomEffect";
 import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
+import { JSONStar } from "../../../interfaces";
+import { Star } from "../../../assets/data/Star";
 
 interface StarProps {
 	// meshProps: ThreeElements["mesh"];
 	onClick: () => void;
-	data: JSONStar | null;
+	data: Star | null;
 }
 
-export const Star = (props: StarProps) => {
+export const TJSStar = (props: StarProps) => {
 	const ref = useRef<THREE.Mesh>(null!);
 	const [clicked, setClicked] = useState<boolean>(false);
 	const [hovered, setHovered] = useState<boolean>(false);
