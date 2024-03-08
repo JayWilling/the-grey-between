@@ -11,24 +11,24 @@ module.exports = {
   connectToServer: async function (callback) {
 
     try {
-        client.connect();
+        await client.connect();
     } catch(e) {
         return callback(e);
         console.log(e);
     }
 
-    // _db = client.db("the-grey-between");
-    // return (_db === undefined ? false : true);
+    _db = client.db("the-grey-between");
+    return (_db === undefined ? false : true);
 
-    client.connect(function (err, db) {
-      // Verify we got a good "db" object
-      if (db)
-      {
-        _db = db.db("the-grey-between");
-        console.log("Successfully connected to MongoDB."); 
-      }
-      return callback(err);
-         });
+    // client.connect(function (err, db) {
+    //   // Verify we got a good "db" object
+    //   if (db)
+    //   {
+    //     _db = db.db("the-grey-between");
+    //     console.log("Successfully connected to MongoDB."); 
+    //   }
+    //   return callback(err);
+    //      });
   },
  
   getDb: function () {
