@@ -12,15 +12,15 @@ const dbo = require("../db/conn");
 const ObjectId = require("mongodb").ObjectId;
  
  
-// This section will help you get a list of all the records.
+// Retrieve the full list of stars
 recordRoutes.route("/star").get(function (req, res) {
  let db_connect = dbo.getDb("the-grey-between");
  db_connect
    .collection("stars")
    .find({})
-   .toArray(function (err, result) {
-     if (err) throw err;
-     res.json(result);
+   .toArray()
+   .then((data) => {
+        res.json(data);
    });
 });
  
@@ -35,14 +35,25 @@ recordRoutes.route("/star/:id").get(function (req, res) {
      res.json(result);
    });
 });
+
+// Add initial list of default stars
+recordRoutes.route("/star/addList").post(async function (request, response) {
+    let db = dbo.getDb();
+
+    db.collection("stars").insertMany(request.body, function (err, res) {
+        if (err) throw err;
+        response.json(res);
+    })
+});
  
 // This section will help you create a new record.
-recordRoutes.route("/star/add").post(function (req, response) {
+recordRoutes.route("/star/add").post(async function (req, response) {
  let db_connect = dbo.getDb();
  let myobj = {
-   name: req.body.name,
-   position: req.body.position,
-   level: req.body.level,
+   data: req.body.data,
+   adjacent: req.body.adjacent,
+   children: req.body.children,
+   comparator: req.body.comparator,
  };
  db_connect.collection("stars").insertOne(myobj, function (err, res) {
    if (err) throw err;
