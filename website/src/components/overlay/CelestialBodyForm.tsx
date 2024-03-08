@@ -2,6 +2,8 @@ import { useState } from "react";
 import { CBProps, OverlayState } from "../../interfaces";
 import "./../../assets/styling/Form.css";
 import { CanvasOverlayProps } from "./HUDOverlay";
+import { onNewNode } from "../../api/starsApi";
+import { Node } from "../../assets/data/UniverseGraph";
 
 export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 	const [celestialBodyValues, setCelestialBodyValues] = useState<CBProps>({
@@ -14,7 +16,19 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 		colour: "red",
 	});
 
-	function handleCelestialBodySubmit(e: React.FormEvent<HTMLFormElement>) {}
+	function handleCelestialBodySubmit(e: React.FormEvent<HTMLFormElement>) {
+		const data: CBProps = {
+			name: "",
+			description: "",
+			starParent: props.currentStar,
+			radius: 5,
+			orbitRadius: 5,
+			orbitVelocity: 5,
+			colour: "green",
+		};
+		// const newNode = new Node<CBProps>(data);
+		// onNewNode()
+	}
 
 	function handleValueChanged(e: React.ChangeEvent<HTMLInputElement>) {}
 
