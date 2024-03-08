@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import { CBProps, JSONStar } from "./interfaces";
+import { UniverseGraph } from "./assets/data/UniverseGraph";
+import { Star } from "./assets/data/Star";
 
 export function objectToScreenPosition(
 	object: THREE.Object3D,
@@ -43,4 +46,52 @@ export function vectorToScreenPosition(
 	vector.z = 0;
 
 	return { x: vector.x, y: vector.y };
+}
+
+type UniverseObject = JSONStar | CBProps;
+
+function nodeComparator(a: UniverseObject, b: UniverseObject): number {
+	return 0;
+}
+
+export function jsonToGraph(stars: Star[]): UniverseGraph<Star> {
+	const newGraph = new UniverseGraph<Star>(jsonStarComparator);
+	for (let i = 0; i < stars.length; i++) {
+		const name = stars[i].n;
+		if (name) {
+			newGraph.addNode(name, stars[i]);
+		}
+	}
+
+	// Ensuring the graph can be queried by index/identifier
+
+	return newGraph;
+}
+
+export function graphToJson(graph: UniverseGraph<Star>) {
+	const graphJson = JSON.stringify(graph);
+
+	console.log(graphJson);
+}
+
+export function jsonStarComparator(a: Star, b: Star): number {
+	// Celestial body has the same name
+	if (a.n === b.n) {
+		return 1;
+	}
+	// No match
+	return 0;
+}
+
+export function cbPropsComparator(a: CBProps, b: CBProps): number {
+	// Celestial body has the same name
+	if (a.name === b.name) {
+		return 1;
+	}
+	// Celestial bodies have the same parent
+	if (a.starParent === b.starParent) {
+		return 2;
+	}
+	// No match
+	return 0;
 }
