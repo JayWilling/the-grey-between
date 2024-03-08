@@ -1,10 +1,11 @@
 import { Line } from "@react-three/drei";
 import React from "react";
 import * as THREE from "three";
-import { JSONStar } from "../../assets/data/Stars";
+import { JSONStar } from "../../interfaces";
+import { Star } from "../../assets/data/Star";
 
 interface TradeRoutesProps {
-	selectedStar: JSONStar | null;
+	selectedStar: Star | null;
 	startPos: THREE.Vector3;
 	endPos: THREE.Vector3[];
 	neighbours: JSONStar[];

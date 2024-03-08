@@ -3,13 +3,14 @@ import { JSONStar, OverlayState } from "../../interfaces";
 import { CelestialBodyForm } from "./CelestialBodyForm";
 import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
 import { SolarSystemStarMenu } from "./StarMenu/SolarSystemStarMenu";
+import { Star } from "../../assets/data/Star";
 
 export interface CanvasOverlayProps {
 	position: { x: number; y: number } | null;
-	selectedStar: JSONStar | null;
-	setSelectedStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
-	currentStar: JSONStar | null;
-	setCurrentStar: React.Dispatch<React.SetStateAction<JSONStar | null>>;
+	selectedStar: Star | null;
+	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
+	currentStar: Star | null;
+	setCurrentStar: React.Dispatch<React.SetStateAction<Star | null>>;
 	showStarMap: boolean;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 	overlayState: OverlayState;
