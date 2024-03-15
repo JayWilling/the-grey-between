@@ -9,6 +9,7 @@ export enum OverlayState {
     StarMap,
     SolarSystem,
     CreateCB,
+    CreateNode,
     Story,
 }
 
@@ -47,6 +48,7 @@ export interface RGBColours {
 }
 
 export enum CBType {
+    Star,
     Planet,
     Asteroid,
     Belt,
