@@ -2,12 +2,18 @@ import React, { useState } from "react";
 import "./Sidebar.css";
 import { NavLink } from "react-router-dom";
 
-export const Sidebar = () => {
+export const Sidebar = (props: {
+	setBackgroundColor: React.Dispatch<React.SetStateAction<string>>;
+}) => {
 	const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
 	const sidebarItemClassName = (isActive: boolean) => {
 		return isActive ? "sidebar-item active" : "sidebar-item inactive";
 	};
+
+	function itemClickHandler(newColor: string) {
+		props.setBackgroundColor(newColor);
+	}
 
 	return (
 		<div className="sidebar">
@@ -30,6 +36,7 @@ export const Sidebar = () => {
 							sidebarItemClassName(isActive)
 						}
 						to="/"
+						onClick={() => itemClickHandler("white")}
 					>
 						Home
 					</NavLink>
@@ -38,6 +45,7 @@ export const Sidebar = () => {
 							sidebarItemClassName(isActive)
 						}
 						to="/starmap"
+						onClick={() => itemClickHandler("black")}
 					>
 						Star Map
 					</NavLink>
@@ -46,6 +54,7 @@ export const Sidebar = () => {
 							sidebarItemClassName(isActive)
 						}
 						to="/pointsofinterest"
+						onClick={() => itemClickHandler("white")}
 					>
 						Points of Interest
 					</NavLink>

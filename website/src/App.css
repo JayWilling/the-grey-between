@@ -25,12 +25,12 @@
 
 .app-contents {
     display: flex;
-    height: 100vh;
+    height: calc(100vh - var(--headerHeight));
 }
 
 .App {
   /* text-align: center; */
-  height: calc(100vh + var(--algorithmHeaderHeight));
+  height: 100vh;
 }
 
 .App-logo {

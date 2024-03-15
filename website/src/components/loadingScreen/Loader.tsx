@@ -1,7 +1,13 @@
 import { ReactNode, useEffect, useMemo, useRef } from "react";
 import "./Loader.css";
 
-export const Loader = (props: { loading: boolean }) => {
+export const Loader = (props: {
+	loading: boolean;
+	colorFrom: string;
+	colorTo: string;
+	loadingText: string;
+	loadedText: string;
+}) => {
 	const loaderRef = useRef(null);
 
 	const dotCount = 60;
@@ -48,14 +54,28 @@ export const Loader = (props: { loading: boolean }) => {
 	}, []);
 
 	return (
-		<div className="loader-container">
-			<p>LOADING</p>
+		<div
+			style={{ backgroundColor: props.colorFrom }}
+			className="loader-container"
+		>
+			<div
+				style={{ backgroundColor: props.colorTo }}
+				className={props.loading ? "void" : "void expand"}
+			>
+				<p
+					className={
+						props.loading ? "loaded-text" : "loaded-text fade"
+					}
+				>
+					{props.loadedText}
+				</p>
+			</div>
+			<p>{props.loadingText}</p>
 			<div ref={loaderRef} className="loader">
 				{dots.map((dot, index) => {
 					return dot;
 				})}
 			</div>
-			<div className={props.loading ? "void" : "void expand"}></div>
 		</div>
 	);
 };

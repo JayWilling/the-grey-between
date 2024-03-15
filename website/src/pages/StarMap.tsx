@@ -372,7 +372,7 @@ export const StarMapCanvas = () => {
 			setTimeout(() => {
 				setStars(response);
 				setCurrentStar(response[0]);
-			}, 3000);
+			}, 5000);
 		});
 	}, []);
 
@@ -448,7 +448,15 @@ export const StarMapCanvas = () => {
 	}
 
 	if (!stars || !currentStar || loading) {
-		return <Loader loading={loading} />;
+		return (
+			<Loader
+				loading={loading}
+				colorFrom="white"
+				colorTo="black"
+				loadingText="LOADING"
+				loadedText="THE GREY BETWEEN"
+			/>
+		);
 	}
 
 	return (
