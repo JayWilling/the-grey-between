@@ -2,8 +2,6 @@ import { useState } from "react";
 import { CBProps, OverlayState } from "../../interfaces";
 import "./../../assets/styling/Form.css";
 import { CanvasOverlayProps } from "./HUDOverlay";
-import { onNewNode } from "../../api/starsApi";
-import { Node } from "../../assets/data/UniverseGraph";
 
 export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 	const [celestialBodyValues, setCelestialBodyValues] = useState<CBProps>({
@@ -64,7 +62,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<h3>Celestial Body Name</h3>
 							<input
 								onChange={(e) => handleValueChanged(e)}
-								name="topic"
+								name="name"
 							></input>
 						</div>
 						<div className="inputField">

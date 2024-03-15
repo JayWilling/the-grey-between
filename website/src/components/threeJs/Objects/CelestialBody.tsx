@@ -188,7 +188,9 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 				attenuation={(t) => t * t * 4}
 			>
 				<mesh ref={meshRef} position={position}>
-					<sphereGeometry args={[1, 16, 16]}>
+					<sphereGeometry
+						args={[1, 16 * props.radius, 16 * props.radius]}
+					>
 						{/* <bufferAttribute
 					attach={"position"}
 					{...celestialBodyBuffer.position}
