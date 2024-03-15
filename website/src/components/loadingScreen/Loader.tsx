@@ -1,8 +1,14 @@
 import { ReactNode, useEffect, useMemo, useRef } from "react";
 import "./Loader.css";
 
+export enum LoadState {
+	Loading,
+	Transition,
+	Loaded,
+}
+
 export const Loader = (props: {
-	loading: boolean;
+	loading: LoadState;
 	colorFrom: string;
 	colorTo: string;
 	loadingText: string;
@@ -12,13 +18,8 @@ export const Loader = (props: {
 
 	const dotCount = 60;
 
-	// const Dot = () => {
-	// 	return (
-	// 		<div className="arm">
-	// 			<div className="dot"></div>
-	// 		</div>
-	// 	);
-	// };
+	const preHighlight = props.colorFrom === "white" ? "black" : "white";
+	const postHighlight = props.colorTo === "white" ? "black" : "white";
 
 	const dots = useMemo(() => {
 		const dotList = [];
@@ -55,22 +56,30 @@ export const Loader = (props: {
 
 	return (
 		<div
-			style={{ backgroundColor: props.colorFrom }}
+			style={{ backgroundColor: props.colorFrom, color: preHighlight }}
 			className="loader-container"
 		>
 			<div
-				style={{ backgroundColor: props.colorTo }}
-				className={props.loading ? "void" : "void expand"}
+				style={{
+					backgroundColor: props.colorTo,
+					color: postHighlight,
+				}}
+				className={
+					props.loading === LoadState.Loading ? "void" : "void expand"
+				}
 			>
 				<p
+					style={{ color: postHighlight }}
 					className={
-						props.loading ? "loaded-text" : "loaded-text fade"
+						props.loading === LoadState.Loading
+							? "loaded-text"
+							: "loaded-text fade"
 					}
 				>
 					{props.loadedText}
 				</p>
 			</div>
-			<p>{props.loadingText}</p>
+			<p style={{ color: preHighlight }}>{props.loadingText}</p>
 			<div ref={loaderRef} className="loader">
 				{dots.map((dot, index) => {
 					return dot;

@@ -33,7 +33,7 @@ import {
 } from "../api/starsApi";
 import { UniverseGraph, Node } from "../assets/data/UniverseGraph";
 import { LoadingCanvas } from "../components/loadingScreen/LoadingCanvas";
-import { Loader } from "../components/loadingScreen/Loader";
+import { LoadState, Loader } from "../components/loadingScreen/Loader";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -344,7 +344,7 @@ const Ground = () => {
 export const StarMapCanvas = () => {
 	// Variables
 
-	const [loading, setLoading] = useState<boolean>(true);
+	const [loading, setLoading] = useState<LoadState>(LoadState.Loading);
 
 	const pointerPos = new THREE.Vector2();
 	const [
@@ -368,10 +368,11 @@ export const StarMapCanvas = () => {
 		promise.then((response) => {
 			if (response == null) return;
 			// Stars = response;
-			setLoading(false);
+			setLoading(LoadState.Transition);
 			setTimeout(() => {
 				setStars(response);
 				setCurrentStar(response[0]);
+				setLoading(LoadState.Loaded);
 			}, 5000);
 		});
 	}, []);
@@ -447,7 +448,7 @@ export const StarMapCanvas = () => {
 		}
 	}
 
-	if (!stars || !currentStar || loading) {
+	if (!stars || !currentStar || loading !== LoadState.Loaded) {
 		return (
 			<Loader
 				loading={loading}
@@ -460,7 +461,7 @@ export const StarMapCanvas = () => {
 	}
 
 	return (
-		<>
+		<div className="starmapContainer">
 			<StarMapOverlay
 				position={highlightedObjectScreenPosition}
 				selectedStar={selectedStar}
@@ -507,6 +508,6 @@ export const StarMapCanvas = () => {
 					setOverlayState={setOverlayState}
 				/>
 			</Canvas>
-		</>
+		</div>
 	);
 };

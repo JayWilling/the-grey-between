@@ -52,6 +52,9 @@
     height: 0%;
     width: 100%;
     z-index: 2;
+    border-top: 1px gray;
+    border-bottom: 1px gray;
+    overflow: hidden;
 }
 
 .void.expand {
@@ -60,7 +63,6 @@
 
 .loaded-text {
     opacity: 100%;
-    color: white;
 }
 
 .loaded-text.fade {

@@ -3,6 +3,7 @@ import "./../assets/styling/PointsOfInterest.css";
 import { getStars } from "../api/starsApi";
 import { Star } from "../assets/data/Star";
 import { CustomButton } from "../components/customButton";
+import { LoadState, Loader } from "../components/loadingScreen/Loader";
 
 // Load and display star data first
 // Load and display planets afterwards
@@ -16,6 +17,9 @@ export enum DisplayCategory {
 }
 
 export const PointsOfInterest = () => {
+	// Default states
+	const [loading, setLoading] = useState<LoadState>(LoadState.Loading);
+
 	// Define the data
 	const [starData, setStarData] = useState<Star[]>([]);
 	const [category, setCategory] = useState<DisplayCategory>(
@@ -27,7 +31,11 @@ export const PointsOfInterest = () => {
 		const promise = getStars();
 		promise.then((data) => {
 			if (!data) return;
-			setStarData(data);
+			setLoading(LoadState.Transition);
+			setTimeout(() => {
+				setStarData(data);
+				setLoading(LoadState.Loaded);
+			}, 5000);
 		});
 	}, []);
 
@@ -40,6 +48,18 @@ export const PointsOfInterest = () => {
 		if (clickedCategory === DisplayCategory.Landmarks) {
 		}
 		console.log(clickedCategory);
+	}
+
+	if (loading !== LoadState.Loaded) {
+		return (
+			<Loader
+				loading={loading}
+				colorFrom="white"
+				colorTo="white"
+				loadingText="LOADING"
+				loadedText="POINTS OF INTEREST"
+			/>
+		);
 	}
 
 	return (
