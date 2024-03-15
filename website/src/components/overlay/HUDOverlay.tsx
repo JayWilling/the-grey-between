@@ -4,12 +4,13 @@ import { CelestialBodyForm } from "./CelestialBodyForm";
 import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
 import { SolarSystemStarMenu } from "./StarMenu/SolarSystemStarMenu";
 import { Star } from "../../assets/data/Star";
+import { NodeForm } from "./NodeForm";
 
 export interface CanvasOverlayProps {
 	position: { x: number; y: number } | null;
 	selectedStar: Star | null;
 	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
-	currentStar: Star | null;
+	currentStar: Star;
 	setCurrentStar: React.Dispatch<React.SetStateAction<Star | null>>;
 	showStarMap: boolean;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
@@ -74,12 +75,15 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 	}, [props.position]);
 
 	function renderStarMenu() {
+		// Change the options in the side bar depending on state
 		switch (props.overlayState) {
 			case OverlayState.StarMap:
 				return <StarMapStarMenu {...props} />;
 			case OverlayState.SolarSystem:
 				return <SolarSystemStarMenu {...props} />;
 			case OverlayState.CreateCB:
+				return;
+			case OverlayState.CreateNode:
 				return;
 			case OverlayState.Story:
 			default:
@@ -93,6 +97,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 
 	return (
 		<div className="starmapOverlay">
+			<NodeForm {...props} />
 			<CelestialBodyForm {...props} />
 			<div className="starMenu-container expanded">
 				<div className="starMenu-searchbar">Search</div>
