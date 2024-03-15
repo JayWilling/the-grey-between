@@ -7,6 +7,8 @@ import { Star } from "../assets/data/Star";
 
 export const BASE_URL = `http://localhost:5000/`;
 
+// Stars API
+
 export async function getStars() {
 	const response = await fetch(BASE_URL + `star`);
 	if (!response.ok) {
@@ -34,9 +36,27 @@ export async function onUploadStarList(stars: Star[]) {
 		});
 }
 
-export async function onNewNode(node: Node<Star>) {
+// Graph API
+
+export async function getNodeById(id: string) {
+	const response = await fetch(BASE_URL + `nodes/${id}`);
+	if (!response.ok) {
+		// const message = `An error has occurred retrieving node of ID ${id} : ${response.statusText}`;
+		// console.log(message);
+		// alert(message);
+		return null;
+	}
+	const node = await response.json();
+	if (!node) {
+		console.warn(`Node with id ${id} not found.`);
+		return;
+	}
+	return node;
+}
+
+export async function addNode(node: Node<Star>) {
 	// const newNode = { ...node };
-	await fetch(BASE_URL + "star/add", {
+	await fetch(BASE_URL + "nodes/add", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -51,6 +71,8 @@ export async function onNewNode(node: Node<Star>) {
 			console.log(response);
 		});
 }
+
+export async function editNode(node: Node<Star>) {}
 
 export async function onEditCelestialBody(
 	editedPlanet: CelestialBody,
