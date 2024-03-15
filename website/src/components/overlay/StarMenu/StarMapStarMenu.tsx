@@ -12,20 +12,8 @@ export const StarMapStarMenu = (props: CanvasOverlayProps) => {
 		// 	false
 		// );
 		e.preventDefault();
-		console.log("Button is working");
 		props.setCurrentStar(props.selectedStar);
 		// props.setSelectedStar(null);
-	}
-
-	function openStarSystem(e: React.MouseEvent<HTMLDivElement>) {
-		e.preventDefault();
-		if (props.showStarMap) {
-			props.setShowStarMap(false);
-			props.setOverlayState(OverlayState.SolarSystem);
-		} else {
-			props.setShowStarMap(true);
-			props.setOverlayState(OverlayState.StarMap);
-		}
 	}
 
 	return (
