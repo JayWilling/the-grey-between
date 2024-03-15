@@ -7,6 +7,7 @@ import {
 	Grid,
 	OrbitControls,
 	PerspectiveCamera,
+	Sphere,
 	useBounds,
 } from "@react-three/drei";
 import TWEEN from "@tweenjs/tween.js";
@@ -15,12 +16,24 @@ import { StarPoints } from "../components/threeJs/StarPoints";
 import { SolarSystem } from "../components/threeJs/SolarSystem/SolarSystem";
 import { TradeRoutes } from "../components/threeJs/TradeRoutes";
 import { updateCameraPosition } from "../threeJsUtils";
-import { graphToJson, jsonToGraph, vectorToScreenPosition } from "../utils";
+import {
+	graphToJson,
+	jsonToGraph,
+	starComparator,
+	vectorToScreenPosition,
+} from "../utils";
 import { StarMapOverlay } from "../components/overlay/HUDOverlay";
 import { JSONStar, OverlayState } from "../interfaces";
 import { Star } from "../assets/data/Star";
-import { getStars, onNewNode, onUploadStarList } from "../api/starsApi";
+import {
+	getStars,
+	addNode,
+	onUploadStarList,
+	getNodeById,
+} from "../api/starsApi";
 import { UniverseGraph, Node } from "../assets/data/UniverseGraph";
+import { LoadingCanvas } from "../components/loadingScreen/LoadingCanvas";
+import { Loader } from "../components/loadingScreen/Loader";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -49,6 +62,7 @@ export interface StarsBufferAttributes {
 }
 
 interface StarMapProps {
+	stars: Star[];
 	pointerPos: THREE.Vector2;
 	cameraControlsRef: React.MutableRefObject<any>;
 	setHighlightPosition: React.Dispatch<
@@ -56,7 +70,7 @@ interface StarMapProps {
 	>;
 	selectedStar: Star | null;
 	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
-	currentStar: Star | null;
+	currentStar: Star;
 	setCurrentStar: React.Dispatch<React.SetStateAction<Star | null>>;
 	showStarMap: boolean;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
@@ -72,7 +86,6 @@ type HtmlElementInterface =
 export const StarMap = (props: StarMapProps) => {
 	const { gl, scene, raycaster, camera } = useThree();
 
-	const [Stars, setStars] = useState<Star[]>([]);
 	// const testStars = new StarsClass(Stars as JSONStar[]);
 	const tradeDestinations: THREE.Vector3[] = [];
 
@@ -104,17 +117,6 @@ export const StarMap = (props: StarMapProps) => {
 	// if (starGraph != null) {
 	// 	graphToJson(starGraph);
 	// }
-
-	useEffect(() => {
-		// Load base star list
-		const promise = getStars();
-		promise.then((response) => {
-			if (response == null) return;
-			// Stars = response;
-			setStars(response);
-			console.log(Stars);
-		});
-	}, []);
 
 	useFrame(() => {
 		// Zoom to selected star
@@ -176,7 +178,7 @@ export const StarMap = (props: StarMapProps) => {
 			props.setShowStarMap(false);
 			props.setOverlayState(OverlayState.SolarSystem);
 		}
-		const newStar = Stars[highlightIndex] as Star;
+		const newStar = props.stars[highlightIndex] as Star;
 		if (props.currentStar === null) {
 			props.setCurrentStar(newStar);
 		}
@@ -213,9 +215,9 @@ export const StarMap = (props: StarMapProps) => {
 		const colour = new THREE.Color();
 		const starIndex: number[] = [];
 
-		for (var i = 0; i < Stars.length; i++) {
+		for (var i = 0; i < props.stars.length; i++) {
 			// Set name
-			const name = Stars[i].n;
+			const name = props.stars[i].n;
 			name ? starNames.push(name) : starNames.push("");
 
 			// Push Star index
@@ -224,9 +226,9 @@ export const StarMap = (props: StarMapProps) => {
 			// Set position
 			// Work out what to do with the stars of unknown position
 			// as 0, 0, 0 should be where sol is
-			const x = Stars[i].x || 0;
-			const y = Stars[i].y || 0;
-			const z = Stars[i].z || 0;
+			const x = props.stars[i].x || 0;
+			const y = props.stars[i].y || 0;
+			const z = props.stars[i].z || 0;
 			starVertices.push(
 				x * POSITION_MULTIPLIER,
 				y * POSITION_MULTIPLIER,
@@ -234,7 +236,7 @@ export const StarMap = (props: StarMapProps) => {
 			);
 
 			// Set colour
-			const tempColour = Stars[i].K;
+			const tempColour = props.stars[i].K;
 			if (tempColour != null) {
 				colour.setRGB(tempColour.r, tempColour.g, tempColour.b);
 			} else {
@@ -270,9 +272,9 @@ export const StarMap = (props: StarMapProps) => {
 			sizes: bufferSizes,
 			index: bufferIndex,
 		};
-	}, [Stars]);
+	}, [props.stars]);
 
-	if (Stars.length <= 0) {
+	if (props.stars.length <= 0) {
 		return <>Loading</>;
 	}
 
@@ -341,18 +343,41 @@ const Ground = () => {
 
 export const StarMapCanvas = () => {
 	// Variables
-	// const { camera } = useThree();
+
+	const [loading, setLoading] = useState<boolean>(true);
+
 	const pointerPos = new THREE.Vector2();
 	const [
 		highlightedObjectScreenPosition,
 		setHighlightedObjectScreenPosition,
 	] = useState<{ x: number; y: number } | null>(null);
+
+	// Star map states
+	const [stars, setStars] = useState<Star[]>([]);
 	const [selectedStar, setSelectedStar] = useState<Star | null>(null);
 	const [currentStar, setCurrentStar] = useState<Star | null>(null);
 	const [showStarMap, setShowStarMap] = useState<boolean>(true);
 	const [overlayState, setOverlayState] = useState<OverlayState>(
 		OverlayState.StarMap
 	);
+
+	// Load Stars
+	useEffect(() => {
+		// Load base star list
+		const promise = getStars();
+		promise.then((response) => {
+			if (response == null) return;
+			// Stars = response;
+			setLoading(false);
+			setTimeout(() => {
+				setStars(response);
+				setCurrentStar(response[0]);
+			}, 3000);
+		});
+	}, []);
+
+	// Node states
+	const [currentNode, setCurrentNode] = useState<Node<Star> | null>(null);
 
 	const cameraControlsRef = useRef<any>(null);
 
@@ -376,6 +401,9 @@ export const StarMapCanvas = () => {
 			1;
 	}
 
+	// updateOverlayState
+	//      Called from star menu options
+	//      Should also be used by starMap instead of setOverlayState
 	function updateOverlayState(
 		e: React.MouseEvent<HTMLElement>,
 		state: OverlayState
@@ -383,7 +411,21 @@ export const StarMapCanvas = () => {
 		e.preventDefault();
 		switch (state) {
 			case OverlayState.SolarSystem:
-				setShowStarMap(false);
+				// Get the selected node
+				if (!currentStar) return;
+				const nodePromise = getNodeById(currentStar._id);
+				nodePromise.then((response) => {
+					if (!response) {
+						// Open new node form
+						updateOverlayState(e, OverlayState.CreateNode);
+						return;
+					}
+					setCurrentNode(response);
+					setShowStarMap(false);
+					setOverlayState(state);
+				});
+				return;
+			case OverlayState.CreateNode:
 				setOverlayState(state);
 				return;
 			case OverlayState.StarMap:
@@ -403,6 +445,10 @@ export const StarMapCanvas = () => {
 					"Missing case for OverlayState: " + state + " in StarMap."
 				);
 		}
+	}
+
+	if (!stars || !currentStar || loading) {
+		return <Loader loading={loading} />;
 	}
 
 	return (
@@ -440,6 +486,7 @@ export const StarMapCanvas = () => {
 				/>
 				<Tween />
 				<StarMap
+					stars={stars}
 					selectedStar={selectedStar}
 					setSelectedStar={setSelectedStar}
 					currentStar={currentStar}
