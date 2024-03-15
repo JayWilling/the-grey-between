@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { CBProps, JSONStar } from "./interfaces";
+import { CBProps, CBType, JSONStar } from "./interfaces";
 import { UniverseGraph } from "./assets/data/UniverseGraph";
 import { Star } from "./assets/data/Star";
 
@@ -55,11 +55,18 @@ function nodeComparator(a: UniverseObject, b: UniverseObject): number {
 }
 
 export function jsonToGraph(stars: Star[]): UniverseGraph<Star> {
-	const newGraph = new UniverseGraph<Star>(jsonStarComparator);
+	const newGraph = new UniverseGraph<Star>(starComparator);
 	for (let i = 0; i < stars.length; i++) {
 		const name = stars[i].n;
 		if (name) {
-			newGraph.addNode(name, stars[i]);
+			newGraph.addNode(
+				name,
+				stars[i],
+				stars[i]._id,
+				name,
+				"",
+				CBType.Star
+			);
 		}
 	}
 
@@ -74,7 +81,7 @@ export function graphToJson(graph: UniverseGraph<Star>) {
 	console.log(graphJson);
 }
 
-export function jsonStarComparator(a: Star, b: Star): number {
+export function starComparator(a: Star, b: Star): number {
 	// Celestial body has the same name
 	if (a.n === b.n) {
 		return 1;
