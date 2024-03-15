@@ -1,4 +1,6 @@
 import { TSMap } from "typescript-map";
+import { CBType } from "../../interfaces";
+import { Star } from "./Star";
 
 // Graph:
 //      Undirected collection of root nodes
@@ -20,15 +22,33 @@ import { TSMap } from "typescript-map";
 // https://www.mongodb.com/docs/manual/reference/operator/aggregation/graphLookup/?_ga=2.209911061.143376147.1709184627-1167249664.1709094178
 // 
 
+export interface INode {
+    data: Star;
+    parentId: string;
+    name: string;
+    type: CBType;
+    description: string;
+    adjacent: Node<Star>[];
+    children: Node<Star>[];
+    comparator: (a: Star, b: Star) => number;
+}
 
 export class Node<T> {
     data: T;
+    parentId: string;
+    name: string;
+    type: CBType;
+    description: string;
     adjacent: Node<T>[];
     children: Node<T>[];
     comparator: (a: T, b: T) => number;
 
-    constructor(data: T, comparator: (a: T, b: T) => number) {
+    constructor(data: T, parentId: string, name: string, description: string, type: CBType, comparator: (a: T, b: T) => number) {
         this.data = data;
+        this.parentId = parentId;
+        this.name = name;
+        this.description = description;
+        this.type = type;
         this.adjacent = [];
         this.children = [];
         this.comparator = comparator;
@@ -57,10 +77,10 @@ export class UniverseGraph<T> {
         this.comparator = comparator;
     }
 
-    addNode(key: string, data: T): Node<T> {
+    addNode(key: string, data: T, parentId: string, name: string, description: string, type: CBType): Node<T> {
         let node = this.nodes.get(key);
         if (node) return node;
-        node = new Node(data, this.comparator);
+        node = new Node(data, parentId, name, description, type, this.comparator);
         this.nodes.set(key, node);
         return node;
     }
