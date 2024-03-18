@@ -4,6 +4,7 @@
     top: var(--headerHeight);
     height: calc(100vh - var(--headerHeight));
     /* height: 100%; */
+    z-index: 2;
 }
 
 .sidebar-container {

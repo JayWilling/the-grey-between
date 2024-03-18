@@ -13,6 +13,7 @@ export const Sidebar = (props: {
 
 	function itemClickHandler(newColor: string) {
 		props.setBackgroundColor(newColor);
+		setIsExpanded(false);
 	}
 
 	return (
