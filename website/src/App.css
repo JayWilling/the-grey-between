@@ -7,7 +7,7 @@
 }
 
 .pageContainer {
-    height: calc(100vh - var(--headerHeight));
+    /* height: calc(100vh - var(--headerHeight)); */
     width: 100%;
 }
 
@@ -32,12 +32,13 @@
 
 .app-contents {
     display: flex;
-    height: calc(100vh - var(--headerHeight));
+    /* height: calc(100vh - var(--headerHeight)); */
+    height: 100%;
 }
 
 .App {
   /* text-align: center; */
-  height: 100vh;
+  height: 100%;
 }
 
 .App-logo {
