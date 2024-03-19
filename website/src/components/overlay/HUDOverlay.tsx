@@ -5,8 +5,10 @@ import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
 import { SolarSystemStarMenu } from "./StarMenu/SolarSystemStarMenu";
 import { Star } from "../../assets/data/Star";
 import { NodeForm } from "./NodeForm";
+import { SearchableDropdown } from "../SearchableDropdown/SearchableDropdown";
 
 export interface CanvasOverlayProps {
+	stars: Star[];
 	position: { x: number; y: number } | null;
 	selectedStar: Star | null;
 	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
@@ -100,7 +102,16 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 			<NodeForm {...props} />
 			<CelestialBodyForm {...props} />
 			<div className="starMenu-container expanded">
-				<div className="starMenu-searchbar">Search</div>
+				{/* <div className="starMenu-searchbar">Search</div> */}
+				<SearchableDropdown
+					options={props.stars}
+					label={"n"}
+					id={"_id"}
+					selectedValue={props.currentStar}
+					handleChange={(star: Star) => {
+						props.setCurrentStar(star);
+					}}
+				/>
 				<div ref={nameRef} className="starMenu-header">
 					{props.selectedStar?.n
 						? props.selectedStar.n

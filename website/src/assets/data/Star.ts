@@ -3,7 +3,7 @@ import { JSONStar, RGBColours } from "../../interfaces";
 export class Star {
     _id: string;
     i: number;
-	n: string | null;
+	n: string;
 	x: number;
 	y: number;
 	z: number;

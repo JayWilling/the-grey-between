@@ -463,6 +463,7 @@ export const StarMapCanvas = () => {
 	return (
 		<div className="starmapContainer">
 			<StarMapOverlay
+				stars={stars}
 				position={highlightedObjectScreenPosition}
 				selectedStar={selectedStar}
 				setSelectedStar={setSelectedStar}

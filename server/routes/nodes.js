@@ -21,7 +21,7 @@ nodeRoutes.route("/nodes").get(function(req, res) {
 // Get node by parent ID
 nodeRoutes.route("/nodes/:id").get(function(req, res) {
     let db_connect = dbo.getDb('the-grey-between');
-    let query = { parentId: ObjectId(req.params.id)};
+    let query = { parentId: new ObjectId(req.params.id)};
     db_connect
         .collection("nodes")
         .findOne(query, function(error, data) {

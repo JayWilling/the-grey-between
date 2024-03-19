@@ -32,7 +32,7 @@ export interface CelestialBodyNode {
 // An intermediary interface for converting JSON data into corresponding classes
 export interface JSONStar extends SharedArrayBuffer {
 	i: number;
-	n: string | null;
+	n: string;
 	x: number;
 	y: number;
 	z: number;
