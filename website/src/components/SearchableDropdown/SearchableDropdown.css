@@ -1,6 +1,6 @@
 .dropdown {
     position: relative;
-    color: #333;
+    color: white;
     cursor: default;
   }
   
@@ -26,7 +26,8 @@
   .dropdown .selectedValue input {
     line-height: 1.5;
     font-size: 1rem;
-    background-color: #fff;
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
     border: 1px solid #ccc;
     border-radius: 2px;
     box-sizing: border-box;
@@ -35,12 +36,19 @@
     padding: 8px 52px 8px 10px;
     transition: all 200ms ease;
     width: 100%;
+    border-radius: 20px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    cursor: text;
   }
   
   .dropdown .options {
     display: none;
-    background-color: #fff;
-    border: 1px solid #ccc;
+    background-color: black;
+    /* border: 1px solid #ccc; */
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
     box-sizing: border-box;
     margin-top: -1px;
@@ -68,6 +76,6 @@
   .dropdown .option.selected,
   .dropdown .option:hover {
     background-color: #f2f9fc;
-    color: #333;
+    /* color: #333; */
   }
   

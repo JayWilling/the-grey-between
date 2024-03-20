@@ -43,12 +43,14 @@ export const SearchableDropdown = (props: DropdownProps) => {
 				<div className="selectedValue">
 					<input
 						ref={inputRef}
+						value={query}
 						onChange={(e) => {
 							onInputChange(e);
 						}}
 						onClick={(e) => {
 							toggle(e);
 						}}
+						placeholder="Search..."
 					/>
 					<div className={`arrow ${isOpen ? "open" : ""}`}></div>
 				</div>

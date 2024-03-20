@@ -110,6 +110,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 					selectedValue={props.currentStar}
 					handleChange={(star: Star) => {
 						props.setCurrentStar(star);
+						props.setSelectedStar(star);
 					}}
 				/>
 				<div ref={nameRef} className="starMenu-header">
