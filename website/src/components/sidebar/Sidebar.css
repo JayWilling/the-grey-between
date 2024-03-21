@@ -37,16 +37,8 @@
     margin-top: calc(var(--algorithmHeaderHeight) - var(--headerHeight) + 15px);
     margin-left: 60px;
     transition: all 0.3s ease-in-out;
-}
-
-.sidebar-btn.upper {
-    background-color: white;
+    backdrop-filter: invert(100%);
     z-index: 2;
-}
-
-.sidebar-btn.lower {
-    background-color: black;
-    z-index: 1;
 }
 
 .sidebar-content {
@@ -59,10 +51,6 @@
     background-color: black;
     transition: all 0.3s ease 0s;
 }
-
-/* .sidebar-container.collapsed .sidebar-content {
-    width: 0%;
-} */
 
 .sidebar-item {
     display: flex;

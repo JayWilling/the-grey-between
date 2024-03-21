@@ -19,9 +19,7 @@ export const Sidebar = (props: {
 	return (
 		<div className="sidebar">
 			<div
-				className={
-					isExpanded ? "sidebar-btn upper" : "sidebar-btn lower"
-				}
+				className={"sidebar-btn"}
 				onClick={() => setIsExpanded(!isExpanded)}
 			></div>
 			<div
