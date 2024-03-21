@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Star } from "../../assets/data/Star";
 import "./SearchableDropdown.css";
 
-interface DropdownProps {
+export interface DropdownProps {
 	options: Star[];
 	label: string;
 	id: string;
@@ -14,7 +14,7 @@ export const SearchableDropdown = (props: DropdownProps) => {
 	const [query, setQuery] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
 
-	const inputRef = useRef(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 
 	const selectOption = (option: Star) => {
 		setQuery("");
@@ -28,10 +28,6 @@ export const SearchableDropdown = (props: DropdownProps) => {
 		});
 	};
 
-	function toggle(e: React.MouseEvent<HTMLInputElement>) {
-		setIsOpen(e && e.target === inputRef.current);
-	}
-
 	function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
 		e.preventDefault();
 		setQuery(e.target.value);
@@ -42,31 +38,38 @@ export const SearchableDropdown = (props: DropdownProps) => {
 			<div className="control">
 				<div className="selectedValue">
 					<input
+						className={`${isOpen ? "open" : ""}`}
 						ref={inputRef}
 						value={query}
 						onChange={(e) => {
 							onInputChange(e);
 						}}
-						onClick={(e) => {
-							toggle(e);
-						}}
 						placeholder="Search..."
+						onFocus={() => {
+							setIsOpen(true);
+						}}
+						onBlur={() => {
+							setIsOpen(false);
+						}}
 					/>
 					<div className={`arrow ${isOpen ? "open" : ""}`}></div>
 				</div>
-
-				<div className={`options ${isOpen ? "open" : ""}`}>
-					{filter(props.options).map((option, index) => {
-						return (
-							<div
-								onClick={() => {
-									selectOption(option);
-								}}
-							>
-								{option["n"]}
-							</div>
-						);
-					})}
+				<div className="optionsContainer">
+					<div className="optionsCover"></div>
+					<div className={`options ${isOpen ? "open" : ""}`}>
+						{filter(props.options).map((option, index) => {
+							return (
+								<div
+									key={option._id}
+									onClick={() => {
+										selectOption(option);
+									}}
+								>
+									{option["n"]}
+								</div>
+							);
+						})}
+					</div>
 				</div>
 			</div>
 		</div>

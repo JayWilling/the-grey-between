@@ -96,28 +96,8 @@ export const StarMap = (props: StarMapProps) => {
 	const [highlightIndex, setHighlightIndex] = useState<number | null>(null);
 	const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-	// Converting JSON to graph structure
-	// let starGraph = null;
-	// if (Stars) {
-	// 	starGraph = jsonToGraph(Stars as Star[]);
-	// }
-
-	// const starClassList: Star[] = [];
-	// for (let i = 0; i < Stars.length; i++) {
-	// 	var newStar = new Star((Stars as JSONStar[])[i]);
-
-	// 	starClassList.push(newStar);
-	// }
-
-	// console.log(Stars as Star[]);
-
-	// console.log(starGraph);
-
-	// onNewNode(new Node<Star>((Stars as Star[])[0], () => 0));
-	// if (starGraph != null) {
-	// 	graphToJson(starGraph);
-	// }
-
+	// Would elevate to parent container
+	//      However, needs to be within the canvas to access camera controls
 	useFrame(() => {
 		// Zoom to selected star
 		if (props.selectedStar === props.currentStar && props.currentStar) {
@@ -413,6 +393,7 @@ export const StarMapCanvas = () => {
 		switch (state) {
 			case OverlayState.SolarSystem:
 				// Get the selected node
+				console.log(currentStar);
 				if (!currentStar) return;
 				const nodePromise = getNodeById(currentStar._id);
 				nodePromise.then((response) => {
