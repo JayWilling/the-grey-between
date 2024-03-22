@@ -9,6 +9,7 @@ app.use(express.json({ limit : '20mb'}));
 app.use(express.urlencoded({ limit : '20mb'}));
 app.use(require("./routes/star"));
 app.use(require("./routes/nodes"));
+app.use(require("./models/graph"));
 
 // get driver connection
 const dbo = require("./db/conn");
