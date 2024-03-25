@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
  
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -6,7 +6,7 @@ const express = require("express");
 const recordRoutes = express.Router();
  
 // This will help us connect to the database
-const dbo = require("../db/conn");
+import dbo from "../db/conn";
  
 // This help convert the id from string to ObjectId for the _id.
 const ObjectId = require("mongodb").ObjectId;
@@ -14,7 +14,7 @@ const ObjectId = require("mongodb").ObjectId;
  
 // Retrieve the full list of stars
 recordRoutes.route("/star").get(function (req, res) {
- let db_connect = dbo.getDb("the-grey-between");
+ const db_connect = dbo.getDb();
  db_connect
    .collection("stars")
    .find({})
