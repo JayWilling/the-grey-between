@@ -1,10 +1,31 @@
 // const { MongoClient } = require("mongodb");
-import { MongoClient } from "mongodb";
+// import { MongoClient } from "mongodb";
+import * as mongodb from "mongodb";
+import MongoStore from "connect-mongo";
+import * as dotenv from "dotenv";
 // const Db = process.env.ATLAS_URI;
 const uri = `mongodb+srv://Cluster68807:eGlHRVxDfkN5@cluster68807.kswq8yj.mongodb.net/the-grey-between?retryWrites=true&w=majority`;
-const client = new MongoClient(uri);
+const client = new mongodb.MongoClient(uri);
  
 var _db;
+
+export const collections : {stars?: mongodb.Collection} = {};
+
+export async function connectToServer(callback : (err: any) => void) {
+
+    const client = new mongodb.MongoClient(process.env.DB_CONN_STRING);
+
+    await client.connect();
+
+    const db: mongodb.Db = client.db(process.env.DB_NAME);
+
+    const starsCollection: mongodb.Collection = db.collection(process.env.STARS_COLLECTION_NAME);
+
+    collections.stars = starsCollection;
+
+    console.log(`Successfully connected to database: ${process.env.DB_NAME}`);
+
+}
 
 const dbo = {
     connectToServer: async function (dbName: string, callback) {
