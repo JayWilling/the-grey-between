@@ -9,7 +9,7 @@ const client = new mongodb.MongoClient(uri);
  
 var _db;
 
-export const collections : {stars?: mongodb.Collection} = {};
+export const collections : {stars?: mongodb.Collection, nodes?: mongodb.Collection} = {};
 
 export async function connectToServer(callback : (err: any) => void) {
 
@@ -20,8 +20,10 @@ export async function connectToServer(callback : (err: any) => void) {
     const db: mongodb.Db = client.db(process.env.DB_NAME);
 
     const starsCollection: mongodb.Collection = db.collection(process.env.STARS_COLLECTION_NAME);
+    const nodesCollection: mongodb.Collection = db.collection(process.env.NODES_COLLECTION_NAME);
 
     collections.stars = starsCollection;
+    collections.nodes = nodesCollection;
 
     console.log(`Successfully connected to database: ${process.env.DB_NAME}`);
 
