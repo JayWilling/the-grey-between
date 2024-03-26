@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
  
 // recordRoutes is an instance of the express router.
 // We use it to define our routes.
@@ -7,21 +7,33 @@ const recordRoutes = express.Router();
  
 // This will help us connect to the database
 import dbo from "../db/conn";
+import { collections } from "../db/conn";
  
 // This help convert the id from string to ObjectId for the _id.
+// import { ObjectId } from "mongodb";
 const ObjectId = require("mongodb").ObjectId;
  
  
 // Retrieve the full list of stars
-recordRoutes.route("/star").get(function (req, res) {
- const db_connect = dbo.getDb();
- db_connect
-   .collection("stars")
-   .find({})
-   .toArray()
-   .then((data) => {
-        res.json(data);
-   });
+recordRoutes.route("/star").get(async function (req: Request, res: Response) {
+
+    // if (!collections.stars) return;
+    try {
+        const stars = await collections.stars.find({}).toArray();
+        res.status(200).send(stars);
+        // res.json(stars);
+    } catch (error) {
+        console.log(error);
+    }
+
+//  const db_connect = dbo.getDb();
+//  db_connect
+//    .collection("stars")
+//    .find({})
+//    .toArray()
+//    .then((data) => {
+//         res.json(data);
+//    });
 });
  
 // This section will help you get a single record by id

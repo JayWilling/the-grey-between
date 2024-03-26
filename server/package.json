@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./dist/server.js",
+    "build": "npx tsc",
     "tsc": "npx tsc",
     "postinstall": "npm run tsc",
     "dev": "ts-node-dev --respawn --pretty --transpile-only index.ts",
