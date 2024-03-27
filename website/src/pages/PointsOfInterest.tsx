@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./../assets/styling/PointsOfInterest.css";
 import { getStars } from "../api/starsApi";
-import { Star } from "../assets/data/Star";
+import { Star } from "../models/Star";
 import { CustomButton } from "../components/customButton";
 import { LoadState, Loader } from "../components/loadingScreen/Loader";
 

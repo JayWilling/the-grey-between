@@ -1,6 +1,6 @@
 // Imports
 import * as THREE from "three";
-import { JSONStar, RGBColours } from "../../interfaces";
+import { JSONStar, RGBColours } from "../interfaces";
 
 // Interfaces & Types
 

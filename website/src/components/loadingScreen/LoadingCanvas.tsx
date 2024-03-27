@@ -5,7 +5,7 @@ import { CBProps, JSONStar } from "../../interfaces";
 import * as THREE from "three";
 import { FunctionalCelestialBody } from "../threeJs/Objects/CelestialBody";
 import TWEEN from "@tweenjs/tween.js";
-import { Star } from "../../assets/data/Star";
+import { Star } from "../../models/Star";
 
 export const LoadingCanvas = () => {
 	const planetList: CBProps[] = useMemo(() => {

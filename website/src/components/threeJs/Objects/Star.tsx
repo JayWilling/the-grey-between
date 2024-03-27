@@ -5,7 +5,7 @@ import { Selection } from "@react-three/postprocessing";
 import { TestBloom } from "../../../effects/BloomEffect";
 import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
 import { JSONStar } from "../../../interfaces";
-import { Star } from "../../../assets/data/Star";
+import { Star } from "../../../models/Star";
 
 interface StarProps {
 	// meshProps: ThreeElements["mesh"];

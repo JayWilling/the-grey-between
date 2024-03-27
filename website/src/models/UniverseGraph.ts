@@ -1,5 +1,5 @@
 import { TSMap } from "typescript-map";
-import { CBType } from "../../interfaces";
+import { CBType } from "../interfaces";
 import { Star } from "./Star";
 
 // Graph:

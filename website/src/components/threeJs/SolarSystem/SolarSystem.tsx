@@ -13,7 +13,7 @@ import {
 } from "../Objects/CelestialBody";
 import { Sphere } from "@react-three/drei";
 import { CBProps, JSONStar } from "../../../interfaces";
-import { Star } from "../../../assets/data/Star";
+import { Star } from "../../../models/Star";
 // import { Points } from "@react-three/drei";
 
 interface SolarSystemProps {

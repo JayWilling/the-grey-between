@@ -1,4 +1,4 @@
-import { JSONStar, RGBColours } from "../../interfaces";
+import { JSONStar, RGBColours } from "../interfaces";
 
 export class Star {
     _id: string;

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Star } from "../../assets/data/Star";
+import { Star } from "../../models/Star";
 import "./SearchableDropdown.css";
 
 export interface DropdownProps {

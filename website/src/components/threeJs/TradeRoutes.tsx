@@ -2,7 +2,7 @@ import { Line } from "@react-three/drei";
 import React from "react";
 import * as THREE from "three";
 import { JSONStar } from "../../interfaces";
-import { Star } from "../../assets/data/Star";
+import { Star } from "../../models/Star";
 
 interface TradeRoutesProps {
 	selectedStar: Star | null;

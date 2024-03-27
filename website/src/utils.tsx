@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { CBProps, CBType, JSONStar } from "./interfaces";
-import { UniverseGraph } from "./assets/data/UniverseGraph";
-import { Star } from "./assets/data/Star";
+import { UniverseGraph } from "./models/UniverseGraph";
+import { Star } from "./models/Star";
 
 export function objectToScreenPosition(
 	object: THREE.Object3D,

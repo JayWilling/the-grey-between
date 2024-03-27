@@ -1,5 +1,5 @@
 import { MeshProps } from "@react-three/fiber";
-import { Star } from "./assets/data/Star";
+import { Star } from "./models/Star";
 
 export interface tempInterface {
     test: string;

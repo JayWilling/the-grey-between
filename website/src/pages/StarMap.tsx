@@ -24,14 +24,14 @@ import {
 } from "../utils";
 import { StarMapOverlay } from "../components/overlay/HUDOverlay";
 import { JSONStar, OverlayState } from "../interfaces";
-import { Star } from "../assets/data/Star";
+import { Star } from "../models/Star";
 import {
 	getStars,
 	addNode,
 	onUploadStarList,
 	getNodeById,
 } from "../api/starsApi";
-import { UniverseGraph, Node } from "../assets/data/UniverseGraph";
+import { UniverseGraph, Node } from "../models/UniverseGraph";
 import { LoadingCanvas } from "../components/loadingScreen/LoadingCanvas";
 import { LoadState, Loader } from "../components/loadingScreen/Loader";
 

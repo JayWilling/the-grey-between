@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Star } from "../../assets/data/Star";
+import { Star } from "../../models/Star";
 import { CBType, OverlayState } from "../../interfaces";
 import { CanvasOverlayProps } from "./HUDOverlay";
-import { INode, Node } from "../../assets/data/UniverseGraph";
+import { INode, Node } from "../../models/UniverseGraph";
 import { starComparator } from "../../utils";
 import { addNode } from "../../api/starsApi";
 

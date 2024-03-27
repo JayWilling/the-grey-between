@@ -3,7 +3,7 @@ import { JSONStar, OverlayState } from "../../interfaces";
 import { CelestialBodyForm } from "./CelestialBodyForm";
 import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
 import { SolarSystemStarMenu } from "./StarMenu/SolarSystemStarMenu";
-import { Star } from "../../assets/data/Star";
+import { Star } from "../../models/Star";
 import { NodeForm } from "./NodeForm";
 import { SearchableDropdown } from "../SearchableDropdown/SearchableDropdown";
 import { SearchBar } from "./SearchBar/SearchBar";
