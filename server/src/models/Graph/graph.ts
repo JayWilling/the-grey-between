@@ -1,9 +1,9 @@
-const { ObjectId } = require('mongodb');
-const mongoose = require('mongoose');
+import { ObjectId } from "mongodb";
+import { Schema, Model } from "mongoose";
 
 // Node
 
-const nodeSchema = new mongoose.Schema();
+const nodeSchema = new Schema();
 nodeSchema.add({
     _id: {
         type: ObjectId,
@@ -39,7 +39,9 @@ nodeSchema.add({
     }
 });
 
-const graphSchema = new mongoose.Schema({
+// Graph
+
+const graphSchema = new Schema({
     nodes: {
         type: [nodeSchema],
         required: true,
@@ -50,7 +52,5 @@ const graphSchema = new mongoose.Schema({
     }
 });
 
-const Node = new mongoose.model("Node", nodeSchema);
-const Graph = new mongoose.model("Graph", graphSchema);
-
-module.exports = Node, Graph;
+export const Node = new Model("Node", nodeSchema);
+export const Graph = new Model("Graph", graphSchema);
