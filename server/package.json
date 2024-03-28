@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist/server.js",
+    "start": "node ./dist/server/src/server.js",
     "build": "npx tsc",
     "tsc": "npx tsc",
     "postinstall": "npm run tsc",
