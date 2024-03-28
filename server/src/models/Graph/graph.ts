@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Schema, Model } from "mongoose";
+import { Schema, model } from "mongoose";
 
 // Node
 
@@ -52,5 +52,5 @@ const graphSchema = new Schema({
     }
 });
 
-export const Node = new Model("Node", nodeSchema);
-export const Graph = new Model("Graph", graphSchema);
+export const Node = model("Node", nodeSchema);
+export const Graph = model("Graph", graphSchema);
