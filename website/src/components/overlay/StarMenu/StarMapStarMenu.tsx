@@ -23,8 +23,8 @@ export const StarMapStarMenu = (props: CanvasOverlayProps) => {
 			</div>
 			<div
 				className="starMenu-item"
-				onClick={(e) =>
-					props.updateOverlayState(e, OverlayState.SolarSystem)
+				onClick={async (e) =>
+					await props.updateOverlayState(e, OverlayState.SolarSystem)
 				}
 			>
 				View system

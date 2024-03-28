@@ -385,7 +385,7 @@ export const StarMapCanvas = () => {
 	// updateOverlayState
 	//      Called from star menu options
 	//      Should also be used by starMap instead of setOverlayState
-	function updateOverlayState(
+	async function updateOverlayState(
 		e: React.MouseEvent<HTMLElement>,
 		state: OverlayState
 	) {
@@ -395,17 +395,16 @@ export const StarMapCanvas = () => {
 				// Get the selected node
 				console.log(currentStar);
 				if (!currentStar) return;
-				const nodePromise = getNodeById(currentStar._id);
-				nodePromise.then((response) => {
-					if (!response) {
-						// Open new node form
-						updateOverlayState(e, OverlayState.CreateNode);
-						return;
-					}
-					setCurrentNode(response);
-					setShowStarMap(false);
-					setOverlayState(state);
-				});
+				const nodePromise = await getNodeById(currentStar._id);
+				console.log(nodePromise);
+				if (!nodePromise) {
+					// Open new node form
+					updateOverlayState(e, OverlayState.CreateNode);
+					return;
+				}
+				setCurrentNode(nodePromise);
+				setShowStarMap(false);
+				setOverlayState(state);
 				return;
 			case OverlayState.CreateNode:
 				setOverlayState(state);
