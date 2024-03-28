@@ -40,16 +40,17 @@ export async function onUploadStarList(stars: Star[]) {
 
 export async function getNodeById(id: string) {
 	const response = await fetch(BASE_URL + `nodes/${id}`);
-	if (!response.ok) {
+	if (!response.ok || response.status != 200) {
 		// const message = `An error has occurred retrieving node of ID ${id} : ${response.statusText}`;
 		// console.log(message);
 		// alert(message);
 		return null;
 	}
 	const node = await response.json();
+	console.log(node);
 	if (!node) {
 		console.warn(`Node with id ${id} not found.`);
-		return;
+		return null;
 	}
 	return node;
 }
