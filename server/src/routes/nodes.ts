@@ -31,22 +31,24 @@ async function getNodes(req: Request, res: Response) {
 async function getNodeByParentId(req: Request, res: Response) {
     if (!collections.nodes) {
         res.sendStatus(503);
-    }
-    try {
+        return;
+    } else {
+        try {
         const id = req.params.id;
-        const query = {
-            parentId: new BSON.ObjectId(id)
-        };
-        const node = await collections.nodes.findOne(query);
-        console.log(node);
-        if (!node) {
-            res.status(503).send();
-
+            const query = {
+                parentId: new BSON.ObjectId(id)
+            };
+            const node = await collections.nodes.findOne(query);
+            console.log(node);
+            if (!node) {
+                res.status(503).send();
+            } else {
+                res.status(200).send(node);
+            }
+        } catch (error) {
+            console.log(error);
+            res.sendStatus(500);
         }
-        res.status(200).send(node);
-    } catch (error) {
-        console.log(error);
-        res.sendStatus(500);
     }
 }
 
@@ -55,21 +57,23 @@ async function getNodeByParentId(req: Request, res: Response) {
 async function addNode(req: Request, res: Response) {
     if (!collections.nodes) {
         res.sendStatus(503);
+        return;
+    } else {
+        try {
+            const node = {
+                parentId: new BSON.ObjectId(req.body.parentId),
+                data: req.body.data,
+                adjacent: req.body.adjacent,
+                children: req.body.children
+            }
+            const result = await collections.nodes.insertOne(node);
+            res.status(202).send(result);
+        } catch (error) {
+            console.log(error);
+            res.sendStatus(500);
+        }
     }
 
-    try {
-        const node = {
-            parentId: new BSON.ObjectId(req.body.parentId),
-            data: req.body.data,
-            adjacent: req.body.adjacent,
-            children: req.body.children
-        }
-        const result = await collections.nodes.insertOne(node);
-        res.status(202).send(result);
-    } catch (error) {
-        console.log(error);
-        res.sendStatus(500);
-    }
 }
 
 // Add routes

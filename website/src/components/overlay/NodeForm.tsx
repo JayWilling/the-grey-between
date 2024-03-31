@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Star } from "../../models/Star";
 import { CBType, OverlayState } from "../../interfaces";
 import { CanvasOverlayProps } from "./HUDOverlay";
@@ -20,6 +20,23 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 		children: [],
 		comparator: starComparator,
 	});
+
+	useEffect(() => {
+		if (!props.currentStar) return;
+		setNodeValues({
+			// @ts-ignore
+			data: props.currentStar,
+			// @ts-ignore
+			parentId: props.currentStar?._id,
+			// @ts-ignore
+			name: props.currentStar?.N,
+			description: "",
+			type: CBType.Star,
+			adjacent: [],
+			children: [],
+			comparator: starComparator,
+		});
+	}, [props.currentStar]);
 
 	function handleNodeSubmit(e: React.FormEvent<HTMLFormElement>) {
 		if (!props.currentStar) return;

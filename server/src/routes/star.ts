@@ -15,14 +15,15 @@ export const starRoutes = express.Router();
 async function getStars(req: Request, res: Response) {
     if (!collections.stars) {
         res.sendStatus(503);
-    };
-    try {
-        const stars = await collections.stars.find({}).toArray();
-        res.status(200).send(stars);
-        // res.json(stars);
-    } catch (error) {
-        console.log(error);
-        res.sendStatus(500);
+    } else {
+        try {
+            const stars = await collections.stars.find({}).toArray();
+            res.status(200).send(stars);
+            // res.json(stars);
+        } catch (error) {
+            console.log(error);
+            res.sendStatus(500);
+        }
     }
 }
 
