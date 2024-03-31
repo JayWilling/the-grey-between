@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import * as BSON from "bson";
+import { INode } from "./../../../website/src/models/UniverseGraph";
 
 import { collections } from "../db/conn";
 
@@ -60,9 +61,13 @@ async function addNode(req: Request, res: Response) {
         return;
     } else {
         try {
-            const node = {
+            const node: INode = {
                 parentId: new BSON.ObjectId(req.body.parentId),
+                // parentId: req.body.parentId,
                 data: req.body.data,
+                name: req.body.name,
+                description: req.body.description,
+                collection: req.body.collection,
                 adjacent: req.body.adjacent,
                 children: req.body.children
             }

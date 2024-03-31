@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { CBProps, CBType, JSONStar } from "./interfaces";
-import { UniverseGraph } from "./models/UniverseGraph";
+import { Collection, UniverseGraph } from "./models/UniverseGraph";
 import { Star } from "./models/Star";
 
 export function objectToScreenPosition(
@@ -65,7 +65,7 @@ export function jsonToGraph(stars: Star[]): UniverseGraph<Star> {
 				stars[i]._id,
 				name,
 				"",
-				CBType.Star
+				Collection.Stars
 			);
 		}
 	}

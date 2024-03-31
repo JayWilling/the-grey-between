@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Star } from "../../models/Star";
 import { CBType, OverlayState } from "../../interfaces";
 import { CanvasOverlayProps } from "./HUDOverlay";
-import { INode, Node } from "../../models/UniverseGraph";
+import { Collection, INode, Node } from "../../models/UniverseGraph";
 import { starComparator } from "../../utils";
 import { addNode } from "../../api/starsApi";
 
@@ -15,7 +15,7 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 		// @ts-ignore
 		name: props.currentStar?.N,
 		description: "",
-		type: CBType.Star,
+		collection: Collection.Stars,
 		adjacent: [],
 		children: [],
 		comparator: starComparator,
@@ -54,8 +54,8 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 			nodeValues.parentId,
 			nodeValues.name,
 			nodeValues.description,
-			nodeValues.type,
-			nodeValues.comparator
+			nodeValues.collection
+			// nodeValues.comparator
 		);
 		addNode(node);
 	}
@@ -66,22 +66,22 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 
 	function handleValueChanged(e: React.ChangeEvent<HTMLInputElement>) {
 		e.preventDefault();
-		let value: string | CBType = e.target.value;
-		if (e.target.name === "type") {
-			switch (e.target.value) {
-				case "Star":
-					value = CBType.Star;
-					break;
-				case "Planet":
-					value = CBType.Planet;
-					break;
-				default:
-					value = CBType.Star;
-					break;
-			}
-		}
-		console.log(value);
-		setNodeValues({ ...nodeValues, [e.target.name]: value });
+		// let value: string | CBType = e.target.value;
+		// if (e.target.name === "type") {
+		// 	switch (e.target.value) {
+		// 		case "Star":
+		// 			value = CBType.Star;
+		// 			break;
+		// 		case "Planet":
+		// 			value = CBType.Planet;
+		// 			break;
+		// 		default:
+		// 			value = CBType.Star;
+		// 			break;
+		// 	}
+		// }
+		// console.log(value);
+		setNodeValues({ ...nodeValues, [e.target.name]: e.target.value });
 	}
 
 	if (!props.currentStar) return <div>Loading</div>;
@@ -121,7 +121,7 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 							<h3>Type</h3>
 							<input
 								onChange={(e) => handleValueChanged(e)}
-								name="type"
+								name="collection"
 							></input>
 						</div>
 						<div className="inputField">
