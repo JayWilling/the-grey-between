@@ -10,6 +10,7 @@ import { SearchBar } from "./SearchBar/SearchBar";
 
 export interface CanvasOverlayProps {
 	stars: Star[];
+	circleIdentifierRef: React.RefObject<HTMLDivElement>;
 	position: { x: number; y: number } | null;
 	selectedStar: Star | null;
 	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
@@ -26,11 +27,11 @@ export interface CanvasOverlayProps {
 }
 
 export const StarMapOverlay = (props: CanvasOverlayProps) => {
-	const circleIdentiferRef = useRef<HTMLDivElement>(null);
+	// const circleIdentiferRef = useRef<HTMLDivElement>(null);
 	const nameRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (circleIdentiferRef.current === null) {
+		if (props.circleIdentifierRef.current === null) {
 			return;
 		}
 		if (props.position === null) {
@@ -40,9 +41,9 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 		// Why 27?
 		// height / width of identifier = 50px, border-width = 2px;
 		// half plus the border gives 27 to centre the star
-		circleIdentiferRef.current.style.top =
+		props.circleIdentifierRef.current.style.top =
 			((props.position.y - 27) / window.innerHeight) * 100 + "%";
-		circleIdentiferRef.current.style.left =
+		props.circleIdentifierRef.current.style.left =
 			((props.position.x - 27) / window.innerWidth) * 100 + "%";
 
 		// Update Star name
@@ -122,7 +123,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 			</div>
 			<div
 				className="starCircleIdentifier"
-				ref={circleIdentiferRef}
+				ref={props.circleIdentifierRef}
 			></div>
 			<div className="solarSystemOverlay"></div>
 		</div>

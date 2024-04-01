@@ -64,6 +64,7 @@ export interface StarsBufferAttributes {
 interface StarMapProps {
 	stars: Star[];
 	pointerPos: THREE.Vector2;
+	circleIdentifierRef: React.RefObject<HTMLDivElement>;
 	cameraControlsRef: React.MutableRefObject<any>;
 	setHighlightPosition: React.Dispatch<
 		React.SetStateAction<{ x: number; y: number } | null>
@@ -123,7 +124,20 @@ export const StarMap = (props: StarMapProps) => {
 				camera,
 				gl
 			);
-			props.setHighlightPosition(screenPosition);
+
+			if (props.circleIdentifierRef.current === null) {
+				return;
+			}
+
+			// Why 27?
+			// height / width of identifier = 50px, border-width = 2px;
+			// half plus the border gives 27 to centre the star
+			props.circleIdentifierRef.current.style.top =
+				((screenPosition.y - 27) / window.innerHeight) * 100 + "%";
+			props.circleIdentifierRef.current.style.left =
+				((screenPosition.x - 27) / window.innerWidth) * 100 + "%";
+
+			// props.setHighlightPosition(screenPosition);
 		}
 	});
 
@@ -332,6 +346,9 @@ export const StarMapCanvas = () => {
 		setHighlightedObjectScreenPosition,
 	] = useState<{ x: number; y: number } | null>(null);
 
+	// Refs
+	const circleIdentifierRef = useRef<HTMLDivElement>(null);
+
 	// Star map states
 	const [stars, setStars] = useState<Star[]>([]);
 	const [selectedStar, setSelectedStar] = useState<Star | null>(null);
@@ -454,6 +471,7 @@ export const StarMapCanvas = () => {
 				overlayState={overlayState}
 				setOverlayState={setOverlayState}
 				updateOverlayState={updateOverlayState}
+				circleIdentifierRef={circleIdentifierRef}
 			/>
 			<Canvas
 				onMouseMove={(e) => {
@@ -487,6 +505,7 @@ export const StarMapCanvas = () => {
 					showStarMap={showStarMap}
 					setShowStarMap={setShowStarMap}
 					setOverlayState={setOverlayState}
+					circleIdentifierRef={circleIdentifierRef}
 				/>
 			</Canvas>
 		</div>
