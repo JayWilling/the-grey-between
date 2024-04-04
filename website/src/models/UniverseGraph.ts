@@ -1,5 +1,5 @@
 import { TSMap } from "typescript-map";
-import { CBType } from "../interfaces";
+import { CBProps, CBType } from "../interfaces";
 import { Star } from "./Star";
 
 // Graph:
@@ -38,7 +38,7 @@ export interface INode {
     collection: Collection;
     description: string;
     adjacent: Node<Star>[];
-    children: Node<Star>[];
+    children: CBProps[];
     // comparator: (a: Star, b: Star) => number;
 }
 
@@ -49,7 +49,7 @@ export class Node<T> {
     collection: Collection;
     description: string;
     adjacent: Node<T>[];
-    children: Node<T>[];
+    children: CBProps[];
     // comparator: (a: T, b: T) => number;
 
     constructor(data: T, parentId: string, name: string, description: string, collection: Collection) {

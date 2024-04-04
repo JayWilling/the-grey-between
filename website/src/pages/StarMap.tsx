@@ -70,6 +70,7 @@ interface StarMapProps {
 		React.SetStateAction<{ x: number; y: number } | null>
 	>;
 	selectedStar: Star | null;
+	node: Node<Star> | null;
 	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
 	currentStar: Star;
 	setCurrentStar: React.Dispatch<React.SetStateAction<Star | null>>;
@@ -274,9 +275,12 @@ export const StarMap = (props: StarMapProps) => {
 
 	return (
 		<Suspense fallback={null}>
-			{!props.showStarMap && props.currentStar != null ? (
+			{!props.showStarMap &&
+			props.currentStar != null &&
+			props.node != null ? (
 				<SolarSystem
-					starData={props.currentStar}
+					// starData={curren}
+					node={props.node}
 					setShowStarMap={props.setShowStarMap}
 					cameraControls={props.cameraControlsRef.current}
 					// updateCameraPosition={updateCameraPosition}
@@ -353,6 +357,7 @@ export const StarMapCanvas = () => {
 	const [stars, setStars] = useState<Star[]>([]);
 	const [selectedStar, setSelectedStar] = useState<Star | null>(null);
 	const [currentStar, setCurrentStar] = useState<Star | null>(null);
+	const [node, setNode] = useState<Node<Star> | null>(null);
 	const [showStarMap, setShowStarMap] = useState<boolean>(true);
 	const [overlayState, setOverlayState] = useState<OverlayState>(
 		OverlayState.StarMap
@@ -496,6 +501,7 @@ export const StarMapCanvas = () => {
 				<StarMap
 					stars={stars}
 					selectedStar={selectedStar}
+					node={node}
 					setSelectedStar={setSelectedStar}
 					currentStar={currentStar}
 					setCurrentStar={setCurrentStar}
