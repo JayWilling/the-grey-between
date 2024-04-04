@@ -357,7 +357,7 @@ export const StarMapCanvas = () => {
 	const [stars, setStars] = useState<Star[]>([]);
 	const [selectedStar, setSelectedStar] = useState<Star | null>(null);
 	const [currentStar, setCurrentStar] = useState<Star | null>(null);
-	const [node, setNode] = useState<Node<Star> | null>(null);
+	const [currentNode, setCurrentNode] = useState<Node<Star> | null>(null);
 	const [showStarMap, setShowStarMap] = useState<boolean>(true);
 	const [overlayState, setOverlayState] = useState<OverlayState>(
 		OverlayState.StarMap
@@ -378,9 +378,6 @@ export const StarMapCanvas = () => {
 			}, 5000);
 		});
 	}, []);
-
-	// Node states
-	const [currentNode, setCurrentNode] = useState<Node<Star> | null>(null);
 
 	const cameraControlsRef = useRef<any>(null);
 
@@ -501,7 +498,7 @@ export const StarMapCanvas = () => {
 				<StarMap
 					stars={stars}
 					selectedStar={selectedStar}
-					node={node}
+					node={currentNode}
 					setSelectedStar={setSelectedStar}
 					currentStar={currentStar}
 					setCurrentStar={setCurrentStar}
