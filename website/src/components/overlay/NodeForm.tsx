@@ -4,7 +4,7 @@ import { CBType, OverlayState } from "../../interfaces";
 import { CanvasOverlayProps } from "./HUDOverlay";
 import { Collection, INode, Node } from "../../models/UniverseGraph";
 import { starComparator } from "../../utils";
-import { addNode } from "../../api/starsApi";
+import { addNode } from "../../api/nodesApi";
 
 export const NodeForm = (props: CanvasOverlayProps) => {
 	const [nodeValues, setNodeValues] = useState<INode>({

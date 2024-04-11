@@ -40,11 +40,10 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 			style={
 				props.overlayState === OverlayState.CreateCB
 					? {
-							top: "10%",
-							left: "10%",
-							width: "80%",
-							height: "80%",
-							padding: "20px",
+							top: "5%",
+							left: "50%",
+							width: "45%",
+							height: "90%",
 					  }
 					: {
 							top: "50%",
@@ -58,25 +57,52 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 			<div className="contextMenuAddTopic">
 				{props.overlayState === OverlayState.CreateCB ? (
 					<form onSubmit={(e) => handleCelestialBodySubmit(e)}>
-						<div className="inputField">
-							<h3>Celestial Body Name</h3>
+						<div className="inputHeading">
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="name"
 							></input>
 						</div>
 						<div className="inputField">
-							<h3>Type</h3>
-							<input
-								onChange={(e) => handleValueChanged(e)}
-								name="parent"
-							></input>
-						</div>
-						<div className="inputField">
 							<h3>Description</h3>
 							<input
 								onChange={(e) => handleValueChanged(e)}
-								name="cards"
+								name="description"
+							></input>
+						</div>
+						<div className="inputField">
+							<h3>Star Parent</h3>
+							<input
+								onChange={(e) => handleValueChanged(e)}
+								name="starParent"
+							></input>
+						</div>
+						<div className="inputField">
+							<h3>Radius</h3>
+							<input
+								onChange={(e) => handleValueChanged(e)}
+								name="radius"
+							></input>
+						</div>
+						<div className="inputField">
+							<h3>Orbit Radius</h3>
+							<input
+								onChange={(e) => handleValueChanged(e)}
+								name="orbitRadius"
+							></input>
+						</div>
+						<div className="inputField">
+							<h3>Orbit Velocity</h3>
+							<input
+								onChange={(e) => handleValueChanged(e)}
+								name="orbitVelocity"
+							></input>
+						</div>
+						<div className="inputField">
+							<h3>Colour</h3>
+							<input
+								onChange={(e) => handleValueChanged(e)}
+								name="colour"
 							></input>
 						</div>
 						<div className="buttonField">

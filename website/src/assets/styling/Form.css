@@ -8,15 +8,29 @@
     transition: all 0.6s ease-in-out;
     z-index: 10;
     pointer-events: all;
+    overflow-y: scroll;
 }
 
 .contextMenuAddTopic {
     display: flex;
     height: 100%;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: flex-start;
     margin-left: 50px;
     margin-right: 50px;
+    margin-top: 50px;
+}
+
+.contextMenuAddTopic .inputHeading input {
+    appearance: none;
+    outline: 0;
+    font-size: 2.5em;
+    border-width: 0 0 2px;
+    width: 100%;
+    box-shadow: none;
+    border-color: white;
+    background-color: transparent;
+    color: white;
 }
 
 .contextMenuAddTopic .inputField input {
