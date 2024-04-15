@@ -63,6 +63,13 @@ export interface CelestialBodyI {
 	colour: string;
 }
 
+// Rename to CBState
+export enum CBCondition {
+    Static = "static",
+    Animated = "animated",
+    Edit = "edit",
+}
+
 export interface CBProps extends MeshProps {
 	name: string;
 	description: string;
@@ -73,14 +80,7 @@ export interface CBProps extends MeshProps {
 	colour: string;
 }
 
-export interface CBState {
-	name: string;
-	description: string;
-	parent: JSONStar | null;
-	radius: number;
-	orbitRadius: number;
-	colour: string;
-	hovered: boolean;
-	selected: boolean;
-	position: [number, number, number];
+export interface CBState extends CBProps {
+    pointerPos: THREE.Vector2;
+    cameraControls: any;
 }

@@ -23,17 +23,15 @@ import {
 	vectorToScreenPosition,
 } from "../utils";
 import { StarMapOverlay } from "../components/overlay/HUDOverlay";
-import { JSONStar, OverlayState } from "../interfaces";
+import { CBProps, JSONStar, OverlayState } from "../interfaces";
 import { Star } from "../models/Star";
-import {
-	getStars,
-	addNode,
-	onUploadStarList,
-	getNodeById,
-} from "../api/starsApi";
+import { getStars, onUploadStarList } from "../api/starsApi";
 import { UniverseGraph, Node } from "../models/UniverseGraph";
 import { LoadingCanvas } from "../components/loadingScreen/LoadingCanvas";
 import { LoadState, Loader } from "../components/loadingScreen/Loader";
+import { getNodeById } from "../api/nodesApi";
+
+import CameraControls from "camera-controls";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -77,6 +75,7 @@ interface StarMapProps {
 	showStarMap: boolean;
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 	setOverlayState: React.Dispatch<React.SetStateAction<OverlayState>>;
+	overlayState: OverlayState;
 }
 
 type HtmlElementInterface =
@@ -283,6 +282,8 @@ export const StarMap = (props: StarMapProps) => {
 					node={props.node}
 					setShowStarMap={props.setShowStarMap}
 					cameraControls={props.cameraControlsRef.current}
+					overlayState={props.overlayState}
+					pointerPos={props.pointerPos}
 					// updateCameraPosition={updateCameraPosition}
 				/>
 			) : (
@@ -363,6 +364,11 @@ export const StarMapCanvas = () => {
 		OverlayState.StarMap
 	);
 
+	// Form data
+	const [celestialBodyData, setCelestialBodyData] = useState<CBProps | null>(
+		null
+	);
+
 	// Load Stars
 	useEffect(() => {
 		// Load base star list
@@ -411,17 +417,19 @@ export const StarMapCanvas = () => {
 		e.preventDefault();
 		switch (state) {
 			case OverlayState.SolarSystem:
-				// Get the selected node
-				console.log(currentStar);
 				if (!currentStar) return;
-				const nodePromise = await getNodeById(currentStar._id);
-				console.log(nodePromise);
-				if (!nodePromise) {
-					// Open new node form
-					updateOverlayState(e, OverlayState.CreateNode);
-					return;
+
+				// Only fetch a node if none is currently selected
+				if (!currentNode) {
+					// Get the selected node
+					const nodePromise = await getNodeById(currentStar._id);
+					if (!nodePromise) {
+						// Open new node form
+						updateOverlayState(e, OverlayState.CreateNode);
+						return;
+					}
+					setCurrentNode(nodePromise);
 				}
-				setCurrentNode(nodePromise);
 				setShowStarMap(false);
 				setOverlayState(state);
 				return;
@@ -430,6 +438,7 @@ export const StarMapCanvas = () => {
 				return;
 			case OverlayState.StarMap:
 				setShowStarMap(true);
+				setCurrentNode(null);
 				setOverlayState(state);
 				return;
 			case OverlayState.CreateCB:
@@ -508,6 +517,7 @@ export const StarMapCanvas = () => {
 					showStarMap={showStarMap}
 					setShowStarMap={setShowStarMap}
 					setOverlayState={setOverlayState}
+					overlayState={overlayState}
 					circleIdentifierRef={circleIdentifierRef}
 				/>
 			</Canvas>

@@ -1,10 +1,25 @@
-import { MeshProps, ThreeElements, useFrame } from "@react-three/fiber";
-import React, { useMemo, useRef, useState } from "react";
+import {
+	MeshProps,
+	ThreeElements,
+	ThreeEvent,
+	useFrame,
+	useThree,
+} from "@react-three/fiber";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Object3D } from "three";
-import { Line, Trail } from "@react-three/drei";
+import {
+	Circle,
+	Line,
+	Plane,
+	Point,
+	Ring,
+	Sphere,
+	Trail,
+} from "@react-three/drei";
 import { POSITION_MULTIPLIER } from "../../../pages/StarMap";
-import { CBProps, CBState, JSONStar } from "../../../interfaces";
+import { CBCondition, CBProps, CBState, JSONStar } from "../../../interfaces";
+import { DragControls } from "three/examples/jsm/Addons";
 
 // Celestial body's can be generated either from the base data (in the format of JSONStar)
 // or from CBProps themselves (Submitted through the form).
@@ -97,16 +112,89 @@ export function getPlanetPosition(
 	return { x, z };
 }
 
-export const FunctionalCelestialBody = (props: CBProps) => {
+export const FunctionalCelestialBody = (props: CBState) => {
 	// const [name, setName] = useState<string>(props.name);
 	// const [description, setDescription] = useState<string>(props.description);
 	// const [radius, setRadius] = useState<number>(props.radius);
 	// const [orbitRadius, setOrbitRadius] = useState<number>(props.orbitRadius);
 	// const [colour, setColour] = useState<string>(props.colour);
 	const [hovered, setHovered] = useState<boolean>(false);
+	const [clicked, setClicked] = useState<boolean>(false);
+	const [state, setState] = useState<CBCondition>(CBCondition.Animated);
+	const [clickPoint, setClickPoint] = useState<THREE.Vector3>(
+		new THREE.Vector3(0, 0, 0)
+	);
+	const [testRadius, setTestRadius] = useState(0);
 	// const [position, setPosition] = useState<[number, number, number]>([
 	// 	0, 0, 0,
 	// ]);
+
+	const celestialBodyRef = useRef<THREE.Object3D[]>(null);
+
+	// Click and drag, what we're concerned with:
+	//      Distance from centre (star.pos) to ring centre (orbitRadius)
+	//      Initial distance from mouse click (props.mousePos) to ring centre
+	//      Final distance of mouse pointer (props.mousePos)
+
+	// 1. Get raycaster
+	const { gl, raycaster, camera } = useThree();
+	const groupRef = useRef<THREE.Group>(null);
+	const ringRef = useRef<THREE.Mesh>(null);
+	const planeRef = useRef<THREE.Mesh>(null);
+	const planeMaterial = new THREE.MeshLambertMaterial({
+		transparent: true,
+		opacity: 0,
+	});
+
+	// 2. Cast a ray to get the object when clicked
+
+	function onGroupClick(e: ThreeEvent<MouseEvent>) {
+		if (!planeRef.current || !ringRef.current) return;
+
+		// Only initiate click and drag on the ring
+		const intersects = raycaster.intersectObject(ringRef.current);
+		if (intersects.length === 0) return;
+		setClicked(true);
+		props.cameraControls.enabled = false;
+	}
+
+	function onGroupDrag(): void {
+		// Call this within useFrame if celestial body is clicked
+		// Change the orbit radius to be:
+		//      distance from centre to mouse +- difference
+
+		if (!planeRef.current || !ringRef.current) return;
+		// 1. Calculate distance from mouse position to ring centre
+		const intersects = raycaster.intersectObject(planeRef.current);
+		if (intersects.length > 0) {
+			// intersects[0].point returns the 3D position
+			// console.log(intersects[0]);
+			setClickPoint(intersects[0].point);
+			const newOrbitRadius = intersects[0].point.distanceTo(
+				new THREE.Vector3(
+					props.starParent?.x,
+					props.starParent?.y,
+					props.starParent?.z
+				)
+			);
+			setTestRadius(newOrbitRadius);
+		}
+	}
+
+	function onGroupRelease() {
+		// Reset clicked state and update new orbit radius
+		setClicked(false);
+		props.cameraControls.enabled = true;
+	}
+	// function castRayToGroup() {
+	//     if (!meshRef.current) return;
+	//     raycaster.setFromCamera(props.pointerPos, camera);
+	//     if (meshRef.current) {
+	//         const intersectedObjs = raycaster.intersectObjects(meshRef.current.);
+	//     }
+	// }
+	// 3. Set some state (The form values)
+	// 4. Use state for celestial body position
 
 	const meshRef = useRef<THREE.Mesh | null>(null);
 
@@ -163,6 +251,10 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 			return;
 		}
 
+		if (clicked) {
+			onGroupDrag();
+		}
+
 		const { x, z } = getPlanetPosition(
 			props.starParent.x * POSITION_MULTIPLIER,
 			props.starParent.z * POSITION_MULTIPLIER,
@@ -179,7 +271,18 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 	});
 
 	return (
-		<group>
+		<group
+			ref={groupRef}
+			onPointerDown={(e) => onGroupClick(e)}
+			onPointerUp={() => onGroupRelease()}
+		>
+			<Sphere args={[1, 8, 8]} position={clickPoint} />
+			<Plane
+				ref={planeRef}
+				args={[props.orbitRadius * 3, props.orbitRadius * 3]}
+				rotation={new THREE.Euler(-0.5 * Math.PI, 0, 0)}
+				material={planeMaterial}
+			/>
 			<Trail
 				local
 				width={2}
@@ -200,12 +303,50 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 						color={hovered ? "hotpink" : "green"}
 					/>
 				</mesh>
+				<mesh
+					ref={ringRef}
+					onPointerEnter={() => setHovered(true)}
+					onPointerLeave={() => setHovered(false)}
+					rotation={new THREE.Euler(0.5 * Math.PI, 0, 0)}
+					// onPointerEnter={() => setHovered(true)}
+					// onPointerLeave={() => setHovered(false)}
+				>
+					<ringGeometry
+						args={[
+							props.orbitRadius - props.radius,
+							props.orbitRadius + props.radius,
+							64,
+						]}
+					></ringGeometry>
+					<meshStandardMaterial
+						color={"turqoise"}
+						side={THREE.DoubleSide}
+					/>
+				</mesh>
+				<mesh
+					rotation={new THREE.Euler(0.5 * Math.PI, 0, 0)}
+					// onPointerEnter={() => setHovered(true)}
+					// onPointerLeave={() => setHovered(false)}
+				>
+					<ringGeometry
+						args={[
+							testRadius - props.radius,
+							testRadius + props.radius,
+							64,
+						]}
+					></ringGeometry>
+					<meshStandardMaterial
+						color={"red"}
+						side={THREE.DoubleSide}
+					/>
+				</mesh>
 			</Trail>
-			<Line
-				worldUnits
+			{/* <Line
+				onPointerEnter={() => setHovered(true)}
+				onPointerLeave={() => setHovered(false)}
 				points={orbitPoints}
 				color="turquoise"
-				lineWidth={0.1}
+				lineWidth={1}
 				rotation={new THREE.Euler(0.5 * Math.PI, 0, 0)}
 				position={
 					props.starParent != null
@@ -216,7 +357,7 @@ export const FunctionalCelestialBody = (props: CBProps) => {
 						  ]
 						: [0, 0, 0]
 				}
-			/>
+			/> */}
 		</group>
 	);
 };
