@@ -54,15 +54,19 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 					  }
 			}
 		>
-			<div className="contextMenuAddTopic">
-				{props.overlayState === OverlayState.CreateCB ? (
-					<form onSubmit={(e) => handleCelestialBodySubmit(e)}>
-						<div className="inputHeading">
-							<input
-								onChange={(e) => handleValueChanged(e)}
-								name="name"
-							></input>
-						</div>
+			{/* <div className="contextMenuAddTopic"> */}
+			{props.overlayState === OverlayState.CreateCB ? (
+				<form
+					className="outerContents"
+					onSubmit={(e) => handleCelestialBodySubmit(e)}
+				>
+					<div className="formHeading fixedContents">
+						<input
+							onChange={(e) => handleValueChanged(e)}
+							name="name"
+						></input>
+					</div>
+					<div className="formContents innerContents">
 						<div className="inputField">
 							<h3>Description</h3>
 							<input
@@ -105,20 +109,58 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 								name="colour"
 							></input>
 						</div>
-						<div className="buttonField">
-							<button type="submit">Save</button>
-							<button
-								type="button"
-								onClick={(e) => handleCancel(e)}
-							>
-								Cancel
-							</button>
-						</div>
-					</form>
-				) : (
-					<></>
-				)}
-			</div>
+					</div>
+					<div className="formFooter fixedContents">
+						<button type="submit">Save</button>
+						<button type="button" onClick={(e) => handleCancel(e)}>
+							Cancel
+						</button>
+					</div>
+				</form>
+			) : (
+				// <div className="outerContents">
+				// 	<div className="fixedContents">
+				// 		<button onClick={(e) => handleCancel(e)}>Close</button>
+				// 	</div>
+				// 	<div className="innerContents">
+				// 		<div className="overflowContents"></div>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 		Content<br></br>
+				// 	</div>
+				// 	<div className="fixedContents">Fixed</div>
+				// </div>
+				<></>
+			)}
+			{/* </div> */}
 		</div>
 	);
 };

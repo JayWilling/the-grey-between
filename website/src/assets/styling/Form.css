@@ -1,14 +1,30 @@
 .starmapOverlay .form {
     position: absolute;
-    top: 50%;
-    left: 50%;
     background-color: #343943;
     color: white;
     border-radius: 5px;
     transition: all 0.6s ease-in-out;
     z-index: 10;
     pointer-events: all;
+    height: 100%;
+}
+
+.outerContents {
+    height: 100%;
+    flex: 1;
+}
+
+.innerContents {
+    /* height: calc(100% - 200px); */
+    height: 70%;
+    padding-left: 20px;
+    padding-right: 20px;
     overflow-y: scroll;
+}
+
+.fixedContents {
+    /* height: 100px; */
+    height: 15%;
 }
 
 .contextMenuAddTopic {
@@ -21,7 +37,11 @@
     margin-top: 50px;
 }
 
-.contextMenuAddTopic .inputHeading input {
+.contextMenuAddTopic form {
+    height: 100vh;
+}
+
+.contextMenuAddTopic .formHeading input {
     appearance: none;
     outline: 0;
     font-size: 2.5em;
@@ -33,7 +53,12 @@
     color: white;
 }
 
-.contextMenuAddTopic .inputField input {
+.contextMenuAddTopic .formContents {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.formContents .inputField input {
     width: 100%;
     font-size: 15px;
     border-radius: 20px;
