@@ -101,31 +101,33 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 
 	return (
 		<div className="starmapOverlay">
-			<SearchBar
-				options={props.stars}
-				label={"n"}
-				id={"_id"}
-				selectedValue={props.currentStar}
-				handleChange={(star: Star) => {
-					props.setSelectedStar(star);
-					props.setCurrentStar(star);
-				}}
-			/>
-			<NodeForm {...props} />
-			<CelestialBodyForm {...props} />
-			<div className="starMenu-container expanded">
-				<div ref={nameRef} className="starMenu-header">
-					{props.selectedStar?.n
-						? props.selectedStar.n
-						: props.currentStar?.n}
+			<div className="starmapRelativeWrapper">
+				<SearchBar
+					options={props.stars}
+					label={"n"}
+					id={"_id"}
+					selectedValue={props.currentStar}
+					handleChange={(star: Star) => {
+						props.setSelectedStar(star);
+						props.setCurrentStar(star);
+					}}
+				/>
+				<NodeForm {...props} />
+				<CelestialBodyForm {...props} />
+				<div className="starMenu-container expanded">
+					<div ref={nameRef} className="starMenu-header">
+						{props.selectedStar?.n
+							? props.selectedStar.n
+							: props.currentStar?.n}
+					</div>
+					{renderStarMenu()}
 				</div>
-				{renderStarMenu()}
+				<div
+					className="starCircleIdentifier"
+					ref={props.circleIdentifierRef}
+				></div>
+				<div className="solarSystemOverlay"></div>
 			</div>
-			<div
-				className="starCircleIdentifier"
-				ref={props.circleIdentifierRef}
-			></div>
-			<div className="solarSystemOverlay"></div>
 		</div>
 	);
 };

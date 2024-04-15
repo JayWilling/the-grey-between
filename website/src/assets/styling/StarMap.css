@@ -13,6 +13,12 @@
     overflow: hidden;
 }
 
+.starmapRelativeWrapper {
+    position: relative;
+    height: calc(100vh - var(--headerHeight));
+    width: 100vw;
+}
+
 .starCircleIdentifier {
     position:absolute;
     border-top: 2px solid white;
