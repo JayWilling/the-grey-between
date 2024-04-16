@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { JSONStar, OverlayState } from "../../interfaces";
+import { CBProps, JSONStar, OverlayState } from "../../interfaces";
 import { CelestialBodyForm } from "./CelestialBodyForm";
 import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
 import { SolarSystemStarMenu } from "./StarMenu/SolarSystemStarMenu";
@@ -24,6 +24,8 @@ export interface CanvasOverlayProps {
 		e: React.MouseEvent<HTMLElement>,
 		state: OverlayState
 	) => void;
+	celestialBodyData: CBProps | null;
+	setCelestialBodyData: React.Dispatch<React.SetStateAction<CBProps | null>>;
 }
 
 export const StarMapOverlay = (props: CanvasOverlayProps) => {

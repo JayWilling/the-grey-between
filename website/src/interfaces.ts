@@ -68,6 +68,7 @@ export enum CBCondition {
     Static = "static",
     Animated = "animated",
     Edit = "edit",
+    New = "new",
 }
 
 export interface CBProps extends MeshProps {
@@ -83,4 +84,5 @@ export interface CBProps extends MeshProps {
 export interface CBState extends CBProps {
     pointerPos: THREE.Vector2;
     cameraControls: any;
+	setCelestialBodyData: React.Dispatch<React.SetStateAction<CBProps | null>>;
 }

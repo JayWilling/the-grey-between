@@ -20,6 +20,8 @@ interface SolarSystemProps {
 	pointerPos: THREE.Vector2;
 	node: Node<Star>;
 	cameraControls: any;
+	celestialBodyData: CBProps | null;
+	setCelestialBodyData: React.Dispatch<React.SetStateAction<CBProps | null>>;
 }
 
 export const SolarSystem = (props: SolarSystemProps) => {
@@ -43,7 +45,7 @@ export const SolarSystem = (props: SolarSystemProps) => {
 	// Add celestial body selected
 	useEffect(() => {
 		if (props.overlayState === OverlayState.CreateCB) {
-			setNewCB({
+			props.setCelestialBodyData({
 				name: "New celestial body",
 				description: "",
 				starParent: props.node.data,
@@ -147,16 +149,21 @@ export const SolarSystem = (props: SolarSystemProps) => {
 							...body,
 							pointerPos: props.pointerPos,
 							cameraControls: props.cameraControls,
+							celestialBodyData: props.celestialBodyData,
+							setCelestialBodyData: props.setCelestialBodyData,
 						}}
 					/>
 				);
 			})}
-			{props.overlayState === OverlayState.CreateCB && newCB ? (
+			{props.overlayState === OverlayState.CreateCB &&
+			props.celestialBodyData ? (
 				<FunctionalCelestialBody
 					{...{
-						...newCB,
+						...props.celestialBodyData,
 						pointerPos: props.pointerPos,
 						cameraControls: props.cameraControls,
+						celestialBodyData: props.celestialBodyData,
+						setCelestialBodyData: props.setCelestialBodyData,
 					}}
 				/>
 			) : (

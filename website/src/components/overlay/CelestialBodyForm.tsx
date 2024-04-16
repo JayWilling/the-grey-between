@@ -4,15 +4,8 @@ import "./../../assets/styling/Form.css";
 import { CanvasOverlayProps } from "./HUDOverlay";
 
 export const CelestialBodyForm = (props: CanvasOverlayProps) => {
-	const [celestialBodyValues, setCelestialBodyValues] = useState<CBProps>({
-		name: "",
-		description: "",
-		starParent: props.selectedStar,
-		radius: 5,
-		orbitRadius: 5,
-		orbitVelocity: 5,
-		colour: "red",
-	});
+	const [celestialBodyValues, setCelestialBodyValues] =
+		useState<CBProps | null>(props.celestialBodyData);
 
 	function handleCelestialBodySubmit(e: React.FormEvent<HTMLFormElement>) {
 		const data: CBProps = {
@@ -33,6 +26,8 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 	function handleCancel(e: React.MouseEvent<HTMLButtonElement>) {
 		props.updateOverlayState(e, OverlayState.SolarSystem);
 	}
+
+	if (!props.celestialBodyData) return <>Loading</>;
 
 	return (
 		<div
@@ -64,6 +59,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 						<input
 							onChange={(e) => handleValueChanged(e)}
 							name="name"
+							value={props.celestialBodyData.name}
 						></input>
 					</div>
 					<div className="formContents innerContents">
@@ -72,6 +68,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="description"
+								value={props.celestialBodyData.description}
 							></input>
 						</div>
 						<div className="inputField">
@@ -79,6 +76,11 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="starParent"
+								value={
+									props.celestialBodyData.starParent
+										? props.celestialBodyData.starParent.n
+										: ""
+								}
 							></input>
 						</div>
 						<div className="inputField">
@@ -86,6 +88,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="radius"
+								value={props.celestialBodyData.radius}
 							></input>
 						</div>
 						<div className="inputField">
@@ -93,6 +96,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="orbitRadius"
+								value={props.celestialBodyData.orbitRadius}
 							></input>
 						</div>
 						<div className="inputField">
@@ -100,6 +104,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="orbitVelocity"
+								value={props.celestialBodyData.orbitVelocity}
 							></input>
 						</div>
 						<div className="inputField">
@@ -107,6 +112,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 							<input
 								onChange={(e) => handleValueChanged(e)}
 								name="colour"
+								value={props.celestialBodyData.colour}
 							></input>
 						</div>
 					</div>

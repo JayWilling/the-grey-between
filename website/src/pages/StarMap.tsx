@@ -76,6 +76,8 @@ interface StarMapProps {
 	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 	setOverlayState: React.Dispatch<React.SetStateAction<OverlayState>>;
 	overlayState: OverlayState;
+	celestialBodyData: CBProps | null;
+	setCelestialBodyData: React.Dispatch<React.SetStateAction<CBProps | null>>;
 }
 
 type HtmlElementInterface =
@@ -278,12 +280,13 @@ export const StarMap = (props: StarMapProps) => {
 			props.currentStar != null &&
 			props.node != null ? (
 				<SolarSystem
-					// starData={curren}
 					node={props.node}
 					setShowStarMap={props.setShowStarMap}
 					cameraControls={props.cameraControlsRef.current}
 					overlayState={props.overlayState}
 					pointerPos={props.pointerPos}
+					celestialBodyData={props.celestialBodyData}
+					setCelestialBodyData={props.setCelestialBodyData}
 					// updateCameraPosition={updateCameraPosition}
 				/>
 			) : (
@@ -483,6 +486,8 @@ export const StarMapCanvas = () => {
 				setOverlayState={setOverlayState}
 				updateOverlayState={updateOverlayState}
 				circleIdentifierRef={circleIdentifierRef}
+				celestialBodyData={celestialBodyData}
+				setCelestialBodyData={setCelestialBodyData}
 			/>
 			<Canvas
 				onMouseMove={(e) => {
@@ -519,6 +524,8 @@ export const StarMapCanvas = () => {
 					setOverlayState={setOverlayState}
 					overlayState={overlayState}
 					circleIdentifierRef={circleIdentifierRef}
+					celestialBodyData={celestialBodyData}
+					setCelestialBodyData={setCelestialBodyData}
 				/>
 			</Canvas>
 		</div>
