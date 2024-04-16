@@ -178,6 +178,7 @@ export const FunctionalCelestialBody = (props: CBState) => {
 				)
 			);
 			setTestRadius(newOrbitRadius);
+			// Update the orbitRadius
 		}
 	}
 
@@ -185,16 +186,16 @@ export const FunctionalCelestialBody = (props: CBState) => {
 		// Reset clicked state and update new orbit radius
 		setClicked(false);
 		props.cameraControls.enabled = true;
+		props.setCelestialBodyData({
+			name: props.name,
+			description: props.description,
+			starParent: props.starParent,
+			radius: props.radius,
+			orbitRadius: testRadius,
+			orbitVelocity: props.orbitVelocity,
+			colour: props.colour,
+		});
 	}
-	// function castRayToGroup() {
-	//     if (!meshRef.current) return;
-	//     raycaster.setFromCamera(props.pointerPos, camera);
-	//     if (meshRef.current) {
-	//         const intersectedObjs = raycaster.intersectObjects(meshRef.current.);
-	//     }
-	// }
-	// 3. Set some state (The form values)
-	// 4. Use state for celestial body position
 
 	const meshRef = useRef<THREE.Mesh | null>(null);
 
@@ -253,20 +254,20 @@ export const FunctionalCelestialBody = (props: CBState) => {
 
 		if (clicked) {
 			onGroupDrag();
-		}
-
-		const { x, z } = getPlanetPosition(
-			props.starParent.x * POSITION_MULTIPLIER,
-			props.starParent.z * POSITION_MULTIPLIER,
-			props.orbitRadius,
-			props.orbitVelocity,
-			state.clock.getElapsedTime()
-		);
-		t = state.clock.getElapsedTime();
-		const y = props.starParent.y * POSITION_MULTIPLIER;
-		// setPosition([x, y, z]);
-		if (meshRef.current) {
-			meshRef.current.position.set(x, y, z);
+		} else {
+			const { x, z } = getPlanetPosition(
+				props.starParent.x * POSITION_MULTIPLIER,
+				props.starParent.z * POSITION_MULTIPLIER,
+				props.orbitRadius,
+				props.orbitVelocity,
+				state.clock.getElapsedTime()
+			);
+			t = state.clock.getElapsedTime();
+			const y = props.starParent.y * POSITION_MULTIPLIER;
+			// setPosition([x, y, z]);
+			if (meshRef.current) {
+				meshRef.current.position.set(x, y, z);
+			}
 		}
 	});
 
