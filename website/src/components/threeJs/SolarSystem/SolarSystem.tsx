@@ -38,8 +38,6 @@ export const SolarSystem = (props: SolarSystemProps) => {
 			e.eventObject.position.z
 		);
 		updateCameraPosition(target, props.cameraControls, camera, 10, 2000);
-
-		// Animate the Gravity fabric
 	}
 
 	// Add celestial body selected
@@ -112,15 +110,6 @@ export const SolarSystem = (props: SolarSystemProps) => {
 		// }
 		// return tempPlanetList;
 	}, []);
-
-	useFrame(() => {
-		// Define a raycaster to determine where to place a new celestial body when clicking
-		// raycaster.intersectObjects;
-		// Cast from mouse screen pos
-		// Intersect with plane at the height of star
-	});
-
-	// We will then map the planets to be displayed
 
 	return (
 		<group>

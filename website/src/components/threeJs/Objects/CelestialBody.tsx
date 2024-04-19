@@ -120,7 +120,9 @@ export const FunctionalCelestialBody = (props: CBState) => {
 	// const [colour, setColour] = useState<string>(props.colour);
 	const [hovered, setHovered] = useState<boolean>(false);
 	const [clicked, setClicked] = useState<boolean>(false);
-	const [state, setState] = useState<CBCondition>(CBCondition.Animated);
+	const [renderState, setRenderState] = useState<CBCondition>(
+		CBCondition.Animated
+	);
 	const [clickPoint, setClickPoint] = useState<THREE.Vector3>(
 		new THREE.Vector3(0, 0, 0)
 	);
@@ -184,6 +186,7 @@ export const FunctionalCelestialBody = (props: CBState) => {
 
 	function onGroupRelease() {
 		// Reset clicked state and update new orbit radius
+		if (!clicked) return;
 		setClicked(false);
 		props.cameraControls.enabled = true;
 		props.setCelestialBodyData({
@@ -254,7 +257,9 @@ export const FunctionalCelestialBody = (props: CBState) => {
 
 		if (clicked) {
 			onGroupDrag();
-		} else {
+		}
+
+		if (renderState === CBCondition.Animated) {
 			const { x, z } = getPlanetPosition(
 				props.starParent.x * POSITION_MULTIPLIER,
 				props.starParent.z * POSITION_MULTIPLIER,

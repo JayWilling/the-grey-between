@@ -21,7 +21,13 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 		// onNewNode()
 	}
 
-	function handleValueChanged(e: React.ChangeEvent<HTMLInputElement>) {}
+	function handleValueChanged(e: React.ChangeEvent<HTMLInputElement>) {
+		if (!props.celestialBodyData) return;
+		props.setCelestialBodyData({
+			...props.celestialBodyData,
+			[e.target.name]: e.target.value,
+		});
+	}
 
 	function handleCancel(e: React.MouseEvent<HTMLButtonElement>) {
 		props.updateOverlayState(e, OverlayState.SolarSystem);
