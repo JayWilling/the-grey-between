@@ -12,6 +12,7 @@ import { Sidebar } from "./components/sidebar/Sidebar";
 import { Home } from "./pages/Home";
 import { StarMapCanvas } from "./pages/StarMap";
 import { PointsOfInterest } from "./pages/PointsOfInterest";
+import StarMapProvider from "./pages/StarMapContext";
 
 const PageWrapper = (props: {
 	backgroundColor: string;
@@ -38,7 +39,14 @@ function App() {
 				>
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/starmap" element={<StarMapCanvas />} />
+						<Route
+							path="/starmap"
+							element={
+								<StarMapProvider>
+									<StarMapCanvas />
+								</StarMapProvider>
+							}
+						/>
 						<Route
 							path="/pointsofinterest"
 							element={<PointsOfInterest />}

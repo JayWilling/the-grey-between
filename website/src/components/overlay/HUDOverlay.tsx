@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { CBProps, JSONStar, OverlayState } from "../../interfaces";
 import { CelestialBodyForm } from "./CelestialBodyForm";
 import { StarMapStarMenu } from "./StarMenu/StarMapStarMenu";
@@ -7,30 +7,22 @@ import { Star } from "../../models/Star";
 import { NodeForm } from "./NodeForm";
 import { SearchableDropdown } from "../SearchableDropdown/SearchableDropdown";
 import { SearchBar } from "./SearchBar/SearchBar";
+import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
 export interface CanvasOverlayProps {
-	stars: Star[];
 	circleIdentifierRef: React.RefObject<HTMLDivElement>;
 	position: { x: number; y: number } | null;
-	selectedStar: Star | null;
-	setSelectedStar: React.Dispatch<React.SetStateAction<Star | null>>;
-	currentStar: Star;
-	setCurrentStar: React.Dispatch<React.SetStateAction<Star | null>>;
-	showStarMap: boolean;
-	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
-	overlayState: OverlayState;
-	setOverlayState: React.Dispatch<React.SetStateAction<OverlayState>>;
 	updateOverlayState: (
 		e: React.MouseEvent<HTMLElement>,
 		state: OverlayState
 	) => void;
-	celestialBodyData: CBProps | null;
-	setCelestialBodyData: React.Dispatch<React.SetStateAction<CBProps | null>>;
 }
 
 export const StarMapOverlay = (props: CanvasOverlayProps) => {
 	// const circleIdentiferRef = useRef<HTMLDivElement>(null);
 	const nameRef = useRef<HTMLDivElement>(null);
+
+	const { states } = useContext(StarMapContext) as IStarMapContext;
 
 	useEffect(() => {
 		if (props.circleIdentifierRef.current === null) {
@@ -56,7 +48,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 		const starQuery = `
         SELECT id2.id
         FROM ident AS id1 JOIN ident AS id2 USING(oidref)
-        WHERE id1.id = '${props.selectedStar?.n}';
+        WHERE id1.id = '${states.selectedStar?.n}';
         `;
 		const fetchRequestOptions: RequestInit = {
 			method: "POST",
@@ -73,8 +65,8 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 		// 	"https://simbad.cds.unistra.fr/simbad/sim-tap/sync",
 		// 	fetchRequestOptions
 		// );
-		if (props.selectedStar?.n) {
-			nameRef.current.innerHTML = props.selectedStar.n;
+		if (states.selectedStar?.n) {
+			nameRef.current.innerHTML = states.selectedStar.n;
 		} else {
 			// props.currentStar?.n;
 		}
@@ -82,7 +74,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 
 	function renderStarMenu() {
 		// Change the options in the side bar depending on state
-		switch (props.overlayState) {
+		switch (states.overlayState) {
 			case OverlayState.StarMap:
 				return <StarMapStarMenu {...props} />;
 			case OverlayState.SolarSystem:
@@ -91,11 +83,13 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 				return;
 			case OverlayState.CreateNode:
 				return;
+			case OverlayState.CreateNode:
+				return;
 			case OverlayState.Story:
 			default:
 				alert(
 					"Missing case for OverlayState: " +
-						props.overlayState +
+						states.overlayState +
 						" in HUDOverlay."
 				);
 		}
@@ -105,22 +99,22 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 		<div className="starmapOverlay">
 			<div className="starmapRelativeWrapper">
 				<SearchBar
-					options={props.stars}
+					options={states.stars}
 					label={"n"}
 					id={"_id"}
-					selectedValue={props.currentStar}
+					selectedValue={states.currentStar}
 					handleChange={(star: Star) => {
-						props.setSelectedStar(star);
-						props.setCurrentStar(star);
+						states.setSelectedStar(star);
+						states.setCurrentStar(star);
 					}}
 				/>
 				<NodeForm {...props} />
 				<CelestialBodyForm {...props} />
 				<div className="starMenu-container expanded">
 					<div ref={nameRef} className="starMenu-header">
-						{props.selectedStar?.n
-							? props.selectedStar.n
-							: props.currentStar?.n}
+						{states.selectedStar?.n
+							? states.selectedStar.n
+							: states.currentStar?.n}
 					</div>
 					{renderStarMenu()}
 				</div>

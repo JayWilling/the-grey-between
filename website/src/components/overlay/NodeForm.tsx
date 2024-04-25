@@ -1,12 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Star } from "../../models/Star";
 import { CBType, OverlayState } from "../../interfaces";
 import { CanvasOverlayProps } from "./HUDOverlay";
 import { Collection, INode, Node } from "../../models/UniverseGraph";
 import { starComparator } from "../../utils";
 import { addNode } from "../../api/nodesApi";
+import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
 export const NodeForm = (props: CanvasOverlayProps) => {
+	const { states } = useContext(StarMapContext) as IStarMapContext;
+
 	const [nodeValues, setNodeValues] = useState<INode>({
 		// @ts-ignore
 		data: props.currentStar,
@@ -18,11 +21,10 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 		collection: Collection.Stars,
 		adjacent: [],
 		children: [],
-		comparator: starComparator,
 	});
 
 	useEffect(() => {
-		if (!props.currentStar) return;
+		if (!states.currentStar) return;
 		setNodeValues({
 			// @ts-ignore
 			data: props.currentStar,
@@ -31,15 +33,16 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 			// @ts-ignore
 			name: props.currentStar?.N,
 			description: "",
-			type: CBType.Star,
+			// type: CBType.Star,
 			adjacent: [],
 			children: [],
-			comparator: starComparator,
+			collection: Collection.Stars,
+			// comparator: starComparator,
 		});
-	}, [props.currentStar]);
+	}, [states.currentStar]);
 
 	function handleNodeSubmit(e: React.FormEvent<HTMLFormElement>) {
-		if (!props.currentStar) return;
+		if (!states.currentStar) return;
 		// const node: Node<Star> = new Node<Star>(
 		// 	props.currentStar,
 		// 	props.currentStar._id,
@@ -84,12 +87,12 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 		setNodeValues({ ...nodeValues, [e.target.name]: e.target.value });
 	}
 
-	if (!props.currentStar) return <div>Loading</div>;
+	if (!states.currentStar) return <div>Loading</div>;
 	return (
 		<div
 			className="form"
 			style={
-				props.overlayState === OverlayState.CreateNode
+				states.overlayState === OverlayState.CreateNode
 					? {
 							top: "10%",
 							left: "10%",
@@ -107,9 +110,9 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 			}
 		>
 			<div className="contextMenuAddTopic">
-				{props.overlayState === OverlayState.CreateNode ? (
+				{states.overlayState === OverlayState.CreateNode ? (
 					<form onSubmit={(e) => handleNodeSubmit(e)}>
-						<h1>{props.currentStar.n}</h1>
+						<h1>{states.currentStar.n}</h1>
 						<div className="inputField">
 							<h3>System Name</h3>
 							<input

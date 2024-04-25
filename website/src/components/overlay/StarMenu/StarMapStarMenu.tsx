@@ -1,7 +1,11 @@
+import { useContext } from "react";
 import { OverlayState } from "../../../interfaces";
 import { CanvasOverlayProps } from "../HUDOverlay";
+import { IStarMapContext, StarMapContext } from "../../../pages/StarMapContext";
 
 export const StarMapStarMenu = (props: CanvasOverlayProps) => {
+	const { states } = useContext(StarMapContext) as IStarMapContext;
+
 	function moveToStar(e: React.MouseEvent<HTMLDivElement>) {
 		// updateCameraPosition(
 		// 	target,
@@ -12,7 +16,7 @@ export const StarMapStarMenu = (props: CanvasOverlayProps) => {
 		// 	false
 		// );
 		e.preventDefault();
-		props.setCurrentStar(props.selectedStar);
+		states.setCurrentStar(states.selectedStar);
 		// props.setSelectedStar(null);
 	}
 

@@ -1,17 +1,10 @@
+import { useContext } from "react";
 import { OverlayState } from "../../../interfaces";
 import { CanvasOverlayProps } from "../HUDOverlay";
+import { IStarMapContext, StarMapContext } from "../../../pages/StarMapContext";
 
 export const SolarSystemStarMenu = (props: CanvasOverlayProps) => {
-	function returnToStarMap(e: React.MouseEvent<HTMLDivElement>) {
-		e.preventDefault();
-		if (props.showStarMap) {
-			props.setShowStarMap(false);
-			props.setOverlayState(OverlayState.SolarSystem);
-		} else {
-			props.setShowStarMap(true);
-			props.setOverlayState(OverlayState.StarMap);
-		}
-	}
+	const { states } = useContext(StarMapContext) as IStarMapContext;
 
 	return (
 		<div className="starMenu">

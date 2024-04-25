@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { TJSStar } from "../Objects/Star";
@@ -12,16 +12,11 @@ import { Star } from "../../../models/Star";
 import { GravityWarp } from "./GravityWarp";
 import { Node } from "../../../models/UniverseGraph";
 import CameraControls from "camera-controls";
+import { IStarMapContext, StarMapContext } from "../../../pages/StarMapContext";
 // import { Points } from "@react-three/drei";
 
 interface SolarSystemProps {
-	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
-	overlayState: OverlayState;
-	pointerPos: THREE.Vector2;
-	node: Node<Star>;
 	cameraControls: any;
-	celestialBodyData: CBProps | null;
-	setCelestialBodyData: React.Dispatch<React.SetStateAction<CBProps | null>>;
 }
 
 export const SolarSystem = (props: SolarSystemProps) => {
@@ -29,6 +24,10 @@ export const SolarSystem = (props: SolarSystemProps) => {
 	const newCBRef = useRef<THREE.Mesh | null>(null);
 
 	const [newCB, setNewCB] = useState<CBProps | null>(null);
+
+	const { states, formValues } = useContext(
+		StarMapContext
+	) as IStarMapContext;
 
 	function onCelestialBodyClick(e: ThreeEvent<MouseEvent>) {
 		// Move the camera
@@ -42,11 +41,14 @@ export const SolarSystem = (props: SolarSystemProps) => {
 
 	// Add celestial body selected
 	useEffect(() => {
-		if (props.overlayState === OverlayState.CreateCB) {
-			props.setCelestialBodyData({
+		if (
+			states.overlayState === OverlayState.CreateCB &&
+			states.currentNode
+		) {
+			formValues.setCelestialBodyData({
 				name: "New celestial body",
 				description: "",
-				starParent: props.node.data,
+				starParent: states.currentNode.data,
 				radius: 1,
 				orbitRadius: 25,
 				orbitVelocity: Math.random(),
@@ -67,7 +69,7 @@ export const SolarSystem = (props: SolarSystemProps) => {
 			// Reset the camera offset
 			camera.clearViewOffset();
 		}
-	}, [props.overlayState]);
+	}, [states.overlayState]);
 
 	// Setup a fake list of planets for the star
 	//      This will later be fetched from the back-end
@@ -75,13 +77,17 @@ export const SolarSystem = (props: SolarSystemProps) => {
 
 	const planetList: CBProps[] = useMemo(() => {
 		// Get planets from node
-		const children = props.node.children;
-		for (let i = 0; i < props.node.children.length; i++) {
+
+		if (!states.currentNode) return [];
+
+		const children = states.currentNode.children;
+		for (let i = 0; i < states.currentNode.children.length; i++) {
 			const currentCB = children[i];
 			const position = new THREE.Vector3(
-				props.node.data.x * POSITION_MULTIPLIER + currentCB.orbitRadius,
-				props.node.data.y * POSITION_MULTIPLIER,
-				props.node.data.z * POSITION_MULTIPLIER
+				states.currentNode.data.x * POSITION_MULTIPLIER +
+					currentCB.orbitRadius,
+				states.currentNode.data.y * POSITION_MULTIPLIER,
+				states.currentNode.data.z * POSITION_MULTIPLIER
 			);
 			const tempCBProps = {};
 		}
@@ -111,23 +117,25 @@ export const SolarSystem = (props: SolarSystemProps) => {
 		// return tempPlanetList;
 	}, []);
 
+	if (!states.currentNode) return <group></group>;
+
 	return (
 		<group>
 			{/* <Sphere ref={newCBRef} position={} /> */}
 			<TJSStar
 				onClick={() => {
-					props.setShowStarMap(true);
+					states.setShowStarMap(true);
 				}}
-				data={props.node.data}
+				data={states.currentNode.data}
 			/>
 			<Planet
 				onClick={(e) => {
 					onCelestialBodyClick(e);
 				}}
 				position={[
-					props.node.data.x * POSITION_MULTIPLIER - 30,
-					props.node.data.y * POSITION_MULTIPLIER,
-					props.node.data.z * POSITION_MULTIPLIER,
+					states.currentNode.data.x * POSITION_MULTIPLIER - 30,
+					states.currentNode.data.y * POSITION_MULTIPLIER,
+					states.currentNode.data.z * POSITION_MULTIPLIER,
 				]}
 			/>
 			{planetList.map((body, index) => {
@@ -136,23 +144,24 @@ export const SolarSystem = (props: SolarSystemProps) => {
 						key={index}
 						{...{
 							...body,
-							pointerPos: props.pointerPos,
+							pointerPos: states.pointerPos,
 							cameraControls: props.cameraControls,
-							celestialBodyData: props.celestialBodyData,
-							setCelestialBodyData: props.setCelestialBodyData,
+							celestialBodyData: formValues.celestialBodyData,
+							setCelestialBodyData:
+								formValues.setCelestialBodyData,
 						}}
 					/>
 				);
 			})}
-			{props.overlayState === OverlayState.CreateCB &&
-			props.celestialBodyData ? (
+			{states.overlayState === OverlayState.CreateCB &&
+			formValues.celestialBodyData ? (
 				<FunctionalCelestialBody
 					{...{
-						...props.celestialBodyData,
-						pointerPos: props.pointerPos,
+						...formValues.celestialBodyData,
+						pointerPos: states.pointerPos,
 						cameraControls: props.cameraControls,
-						celestialBodyData: props.celestialBodyData,
-						setCelestialBodyData: props.setCelestialBodyData,
+						celestialBodyData: formValues.celestialBodyData,
+						setCelestialBodyData: formValues.setCelestialBodyData,
 					}}
 				/>
 			) : (
@@ -160,9 +169,9 @@ export const SolarSystem = (props: SolarSystemProps) => {
 			)}
 			<GravityWarp
 				centre={{
-					x: props.node.data.x * POSITION_MULTIPLIER,
-					y: props.node.data.y * POSITION_MULTIPLIER,
-					z: props.node.data.z * POSITION_MULTIPLIER,
+					x: states.currentNode.data.x * POSITION_MULTIPLIER,
+					y: states.currentNode.data.y * POSITION_MULTIPLIER,
+					z: states.currentNode.data.z * POSITION_MULTIPLIER,
 				}}
 				celestialBodies={planetList}
 				depth={10}

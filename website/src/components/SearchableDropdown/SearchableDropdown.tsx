@@ -6,7 +6,7 @@ export interface DropdownProps {
 	options: Star[];
 	label: string;
 	id: string;
-	selectedValue: Star;
+	selectedValue: Star | null;
 	handleChange: (star: Star) => void;
 }
 

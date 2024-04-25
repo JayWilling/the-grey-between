@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useContext } from "react";
 import "./../../assets/styling/StarMap.css";
 
 import * as THREE from "three";
@@ -15,17 +15,16 @@ import {
 	LensFlareParams,
 } from "../../assets/shaders/lensFlareTemp.js";
 import { objectToScreenPosition, vectorToScreenPosition } from "../../utils";
+import { StarMapContext, IStarMapContext } from "../../pages/StarMapContext";
 
 interface StarPointProps {
 	starsBuffer: StarsBufferAttributes;
-	pointerPos: THREE.Vector2;
 	highlightIndex: number | null;
 	setHighlightIndex: React.Dispatch<React.SetStateAction<number | null>>;
 	setHighlightPosition: React.Dispatch<
 		React.SetStateAction<{ x: number; y: number } | null>
 	>;
 	cameraControlsRef: any;
-	setShowStarMap: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedIndex: number | null;
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
 	onClickEvent: (e: ThreeEvent<MouseEvent>) => void;
@@ -34,7 +33,8 @@ interface StarPointProps {
 
 export const StarPoints = (props: StarPointProps) => {
 	const { gl, scene, raycaster, camera } = useThree();
-	// let intersectIndex: number | null = null;
+
+	const { states } = useContext(StarMapContext) as IStarMapContext;
 
 	// Define Point Materials
 	const vertexShaderText = `
@@ -148,7 +148,7 @@ export const StarPoints = (props: StarPointProps) => {
 		// Sphere geometry
 		// highlightSphere.position;
 
-		raycaster.setFromCamera(props.pointerPos, camera);
+		raycaster.setFromCamera(states.pointerPos, camera);
 		const intersectedObjs = raycaster.intersectObject(points);
 
 		if (intersectedObjs.length > 0) {
