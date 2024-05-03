@@ -21,10 +21,6 @@ interface StarPointProps {
 	starsBuffer: StarsBufferAttributes;
 	highlightIndex: number | null;
 	setHighlightIndex: React.Dispatch<React.SetStateAction<number | null>>;
-	setHighlightPosition: React.Dispatch<
-		React.SetStateAction<{ x: number; y: number } | null>
-	>;
-	cameraControlsRef: any;
 	selectedIndex: number | null;
 	setSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
 	onClickEvent: (e: ThreeEvent<MouseEvent>) => void;

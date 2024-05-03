@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useRef, useState } from "react";
 import { Star } from "../models/Star";
 import { Node } from "../models/UniverseGraph";
 import { CBProps, OverlayState } from "../interfaces";
@@ -7,6 +7,11 @@ import * as THREE from "three";
 export interface IStarMapContext {
 	states: {
 		pointerPos: THREE.Vector2;
+
+		highlightedObjectScreenPosition: { x: number; y: number } | null;
+		setHighlightedObjectScreenPosition: React.Dispatch<
+			React.SetStateAction<{ x: number; y: number } | null>
+		>;
 
 		stars: Star[];
 		setStars: React.Dispatch<React.SetStateAction<Star[]>>;
@@ -32,6 +37,10 @@ export interface IStarMapContext {
 			React.SetStateAction<CBProps | null>
 		>;
 	};
+	refs: {
+		circleIdentifierRef: React.RefObject<HTMLDivElement>;
+		cameraControlsRef: React.RefObject<any>;
+	};
 }
 
 export const StarMapContext = createContext<IStarMapContext | null>(null);
@@ -39,6 +48,10 @@ export const StarMapContext = createContext<IStarMapContext | null>(null);
 export const StarMapProvider = (props: React.PropsWithChildren) => {
 	// Star map states
 	const pointerPos = new THREE.Vector2();
+	const [
+		highlightedObjectScreenPosition,
+		setHighlightedObjectScreenPosition,
+	] = useState<{ x: number; y: number } | null>(null);
 	const [stars, setStars] = useState<Star[]>([]);
 	const [selectedStar, setSelectedStar] = useState<Star | null>(null);
 	const [currentStar, setCurrentStar] = useState<Star | null>(null);
@@ -53,9 +66,15 @@ export const StarMapProvider = (props: React.PropsWithChildren) => {
 		null
 	);
 
+	// Refs
+	const circleIdentifierRef = useRef<HTMLDivElement>(null);
+	const cameraControlsRef = useRef<any>(null);
+
 	const contextValues: IStarMapContext = {
 		states: {
 			pointerPos,
+			highlightedObjectScreenPosition,
+			setHighlightedObjectScreenPosition,
 			stars,
 			setStars: setStars,
 			selectedStar,
@@ -72,6 +91,10 @@ export const StarMapProvider = (props: React.PropsWithChildren) => {
 		formValues: {
 			celestialBodyData,
 			setCelestialBodyData,
+		},
+		refs: {
+			circleIdentifierRef,
+			cameraControlsRef,
 		},
 	};
 

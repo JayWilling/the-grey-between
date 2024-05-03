@@ -10,8 +10,6 @@ import { SearchBar } from "./SearchBar/SearchBar";
 import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
 export interface CanvasOverlayProps {
-	circleIdentifierRef: React.RefObject<HTMLDivElement>;
-	position: { x: number; y: number } | null;
 	updateOverlayState: (
 		e: React.MouseEvent<HTMLElement>,
 		state: OverlayState
@@ -22,23 +20,29 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 	// const circleIdentiferRef = useRef<HTMLDivElement>(null);
 	const nameRef = useRef<HTMLDivElement>(null);
 
-	const { states } = useContext(StarMapContext) as IStarMapContext;
+	const { states, refs } = useContext(StarMapContext) as IStarMapContext;
 
 	useEffect(() => {
-		if (props.circleIdentifierRef.current === null) {
+		if (refs.circleIdentifierRef.current === null) {
 			return;
 		}
-		if (props.position === null) {
+		if (states.highlightedObjectScreenPosition === null) {
 			return;
 		}
 
 		// Why 27?
 		// height / width of identifier = 50px, border-width = 2px;
 		// half plus the border gives 27 to centre the star
-		props.circleIdentifierRef.current.style.top =
-			((props.position.y - 27) / window.innerHeight) * 100 + "%";
-		props.circleIdentifierRef.current.style.left =
-			((props.position.x - 27) / window.innerWidth) * 100 + "%";
+		refs.circleIdentifierRef.current.style.top =
+			((states.highlightedObjectScreenPosition.y - 27) /
+				window.innerHeight) *
+				100 +
+			"%";
+		refs.circleIdentifierRef.current.style.left =
+			((states.highlightedObjectScreenPosition.x - 27) /
+				window.innerWidth) *
+				100 +
+			"%";
 
 		// Update Star name
 		if (nameRef.current === null) {
@@ -70,7 +74,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 		} else {
 			// props.currentStar?.n;
 		}
-	}, [props.position]);
+	}, [states.highlightedObjectScreenPosition]);
 
 	function renderStarMenu() {
 		// Change the options in the side bar depending on state
@@ -120,7 +124,7 @@ export const StarMapOverlay = (props: CanvasOverlayProps) => {
 				</div>
 				<div
 					className="starCircleIdentifier"
-					ref={props.circleIdentifierRef}
+					ref={refs.circleIdentifierRef}
 				></div>
 				<div className="solarSystemOverlay"></div>
 			</div>

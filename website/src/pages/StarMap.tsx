@@ -72,13 +72,7 @@ export interface StarsBufferAttributes {
 	index: THREE.BufferAttribute;
 }
 
-interface StarMapProps {
-	circleIdentifierRef: React.RefObject<HTMLDivElement>;
-	cameraControlsRef: React.MutableRefObject<any>;
-	setHighlightPosition: React.Dispatch<
-		React.SetStateAction<{ x: number; y: number } | null>
-	>;
-}
+interface StarMapProps {}
 
 type HtmlElementInterface =
 	| HTMLDivElement
@@ -89,7 +83,7 @@ type HtmlElementInterface =
 export const StarMap = (props: StarMapProps) => {
 	const { gl, scene, raycaster, camera } = useThree();
 
-	const { states, formValues } = useContext(
+	const { states, formValues, refs } = useContext(
 		StarMapContext
 	) as IStarMapContext;
 
@@ -131,16 +125,16 @@ export const StarMap = (props: StarMapProps) => {
 				gl
 			);
 
-			if (props.circleIdentifierRef.current === null) {
+			if (refs.circleIdentifierRef.current === null) {
 				return;
 			}
 
 			// Why 27?
 			// height / width of identifier = 50px, border-width = 2px;
 			// half plus the border gives 27 to centre the star
-			props.circleIdentifierRef.current.style.top =
+			refs.circleIdentifierRef.current.style.top =
 				((screenPosition.y - 27) / window.innerHeight) * 100 + "%";
-			props.circleIdentifierRef.current.style.left =
+			refs.circleIdentifierRef.current.style.left =
 				((screenPosition.x - 27) / window.innerWidth) * 100 + "%";
 
 			// props.setHighlightPosition(screenPosition);
@@ -199,7 +193,7 @@ export const StarMap = (props: StarMapProps) => {
 	function moveCameraToStar(target: THREE.Vector3, zoom: boolean): void {
 		updateCameraPosition(
 			target,
-			props.cameraControlsRef.current,
+			refs.cameraControlsRef.current,
 			camera,
 			10,
 			2000,
@@ -284,7 +278,7 @@ export const StarMap = (props: StarMapProps) => {
 			states.currentStar != null &&
 			states.currentNode != null ? (
 				<SolarSystem
-					cameraControls={props.cameraControlsRef.current}
+					cameraControls={refs.cameraControlsRef.current}
 					// updateCameraPosition={updateCameraPosition}
 				/>
 			) : (
@@ -293,8 +287,6 @@ export const StarMap = (props: StarMapProps) => {
 						starsBuffer={starsBuffer}
 						highlightIndex={highlightIndex}
 						setHighlightIndex={setHighlightIndex}
-						setHighlightPosition={props.setHighlightPosition}
-						cameraControlsRef={props.cameraControlsRef}
 						selectedIndex={selectedIndex}
 						setSelectedIndex={setSelectedIndex}
 						onClickEvent={onStarClick}
@@ -344,16 +336,7 @@ export const StarMapCanvas = () => {
 
 	const [loading, setLoading] = useState<LoadState>(LoadState.Loading);
 
-	// const pointerPos = new THREE.Vector2();
-	const [
-		highlightedObjectScreenPosition,
-		setHighlightedObjectScreenPosition,
-	] = useState<{ x: number; y: number } | null>(null);
-
-	// Refs
-	const circleIdentifierRef = useRef<HTMLDivElement>(null);
-
-	const { states } = useContext(StarMapContext) as IStarMapContext;
+	const { states, refs } = useContext(StarMapContext) as IStarMapContext;
 
 	// Star map states
 	// const [stars, setStars] = useState<Star[]>([]);
@@ -384,19 +367,21 @@ export const StarMapCanvas = () => {
 	useEffect(() => {
 		// Load base star list
 		const promise = getStars();
-		promise.then((response) => {
-			if (response == null) return;
-			// Stars = response;
-			setLoading(LoadState.Transition);
-			setTimeout(() => {
-				states.setStars(response);
-				states.setCurrentStar(response[0]);
+		promise
+			.then((response) => {
+				if (response == null) return;
+				// Stars = response;
+				setLoading(LoadState.Transition);
+				setTimeout(() => {
+					states.setStars(response);
+					states.setCurrentStar(response[0]);
+					states.setSelectedStar(response[0]);
+				}, 5000);
+			})
+			.finally(() => {
 				setLoading(LoadState.Loaded);
-			}, 5000);
-		});
+			});
 	}, []);
-
-	const cameraControlsRef = useRef<any>(null);
 
 	function Tween() {
 		useFrame(() => {
@@ -483,11 +468,7 @@ export const StarMapCanvas = () => {
 
 	return (
 		<div className="starmapContainer">
-			<StarMapOverlay
-				position={highlightedObjectScreenPosition}
-				updateOverlayState={updateOverlayState}
-				circleIdentifierRef={circleIdentifierRef}
-			/>
+			<StarMapOverlay updateOverlayState={updateOverlayState} />
 			<Canvas
 				onMouseMove={(e) => {
 					onMouseMoveEvent(e);
@@ -498,7 +479,7 @@ export const StarMapCanvas = () => {
 				<color attach={"background"} args={["black"]} />
 				<Ground />
 				<OrbitControls
-					ref={cameraControlsRef}
+					ref={refs.cameraControlsRef}
 					makeDefault
 					enablePan={true}
 					enableZoom={true}
@@ -508,11 +489,7 @@ export const StarMapCanvas = () => {
 					maxPolarAngle={Math.PI / 1.75}
 				/>
 				<Tween />
-				<StarMap
-					setHighlightPosition={setHighlightedObjectScreenPosition}
-					cameraControlsRef={cameraControlsRef}
-					circleIdentifierRef={circleIdentifierRef}
-				/>
+				<StarMap />
 			</Canvas>
 		</div>
 	);
