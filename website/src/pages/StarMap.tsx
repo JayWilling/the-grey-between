@@ -45,6 +45,7 @@ import {
 	StarMapContext,
 	StarMapProvider,
 } from "./StarMapContext";
+import { useQuery } from "@tanstack/react-query";
 
 export const POSITION_MULTIPLIER = 3;
 
@@ -338,50 +339,25 @@ export const StarMapCanvas = () => {
 
 	const { states, refs } = useContext(StarMapContext) as IStarMapContext;
 
-	// Star map states
-	// const [stars, setStars] = useState<Star[]>([]);
-	// const [selectedStar, setSelectedStar] = useState<Star | null>(null);
-	// const [currentStar, setCurrentStar] = useState<Star | null>(null);
-	// const [currentNode, setCurrentNode] = useState<Node<Star> | null>(null);
-	// const [showStarMap, setShowStarMap] = useState<boolean>(true);
-	// const [overlayState, setOverlayState] = useState<OverlayState>(
-	// 	OverlayState.StarMap
-	// );
+	const { status, data, error, isFetching } = useQuery({
+		queryKey: ["stars"],
+		queryFn: getStars,
+	});
 
-	// Form data
-	// const [celestialBodyData, setCelestialBodyData] = useState<CBProps | null>(
-	// 	null
-	// );
-
-	// Context Providers
-	// export const StarMapContext = createContext({
-	// 	pointerPos: pointerPos,
-	// 	selectedStar: [selectedStar, setSelectedStar],
-	// 	currentStar: [currentStar, setCurrentStar],
-	// 	currentNode: [currentNode, setCurrentNode],
-	// 	overlayState: [overlayState, setOverlayState],
-	// 	celestialBodyData: [celestialBodyData, setCelestialBodyData],
-	// });
-
-	// Load Stars
 	useEffect(() => {
-		// Load base star list
-		const promise = getStars();
-		promise
-			.then((response) => {
-				if (response == null) return;
-				// Stars = response;
-				setLoading(LoadState.Transition);
-				setTimeout(() => {
-					states.setStars(response);
-					states.setCurrentStar(response[0]);
-					states.setSelectedStar(response[0]);
-				}, 5000);
-			})
-			.finally(() => {
-				setLoading(LoadState.Loaded);
-			});
-	}, []);
+		// Do nothing if our data has not yet loaded
+		if (status !== "success" || !data) {
+			setLoading(LoadState.Loading);
+			return;
+		}
+		setLoading(LoadState.Transition);
+		setTimeout(() => {
+			states.setStars(data);
+			states.setCurrentStar(data[0]);
+			states.setSelectedStar(data[0]);
+			setLoading(LoadState.Loaded);
+		}, 5000);
+	}, [status, data]);
 
 	function Tween() {
 		useFrame(() => {
@@ -454,7 +430,7 @@ export const StarMapCanvas = () => {
 		}
 	}
 
-	if (!states.stars || !states.currentStar || loading !== LoadState.Loaded) {
+	if (loading !== LoadState.Loaded) {
 		return (
 			<Loader
 				loading={loading}

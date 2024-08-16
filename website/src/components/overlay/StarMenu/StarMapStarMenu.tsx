@@ -16,7 +16,9 @@ export const StarMapStarMenu = (props: CanvasOverlayProps) => {
 		// 	false
 		// );
 		e.preventDefault();
-		states.setCurrentStar(states.selectedStar);
+		if (states.selectedStar != states.currentStar) {
+			states.setCurrentStar(states.selectedStar);
+		}
 		// props.setSelectedStar(null);
 	}
 
