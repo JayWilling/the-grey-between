@@ -24,7 +24,6 @@ export async function getNodeById(id: string) {
 }
 
 export async function addNode(node: Node<Star>) {
-	// const newNode = { ...node };
 	await fetch(BASE_URL + "nodes/add", {
 		method: "POST",
 		headers: {

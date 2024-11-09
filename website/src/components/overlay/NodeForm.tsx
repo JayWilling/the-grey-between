@@ -1,63 +1,45 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Star } from "../../models/Star";
-import { CBType, OverlayState } from "../../interfaces";
-import { CanvasOverlayProps } from "./HUDOverlay";
+import { OverlayState } from "../../interfaces";
 import { Collection, INode, Node } from "../../models/UniverseGraph";
 import { starComparator } from "../../utils";
 import { addNode } from "../../api/nodesApi";
 import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
-export const NodeForm = (props: CanvasOverlayProps) => {
+interface INodeFormProps {
+	updateOverlayState: (
+		e: React.MouseEvent<HTMLElement>,
+		state: OverlayState
+	) => void;
+}
+
+export const NodeForm = (props: INodeFormProps) => {
 	const { states } = useContext(StarMapContext) as IStarMapContext;
 
-	const [nodeValues, setNodeValues] = useState<INode>({
-		// @ts-ignore
-		data: props.currentStar,
-		// @ts-ignore
-		parentId: props.currentStar?._id,
-		// @ts-ignore
-		name: props.currentStar?.N,
-		description: "",
-		collection: Collection.Stars,
-		adjacent: [],
-		children: [],
-	});
+	const [nodeValues, setNodeValues] = useState<INode | null>(null);
 
 	useEffect(() => {
 		if (!states.currentStar) return;
 		setNodeValues({
-			// @ts-ignore
-			data: props.currentStar,
-			// @ts-ignore
-			parentId: props.currentStar?._id,
-			// @ts-ignore
-			name: props.currentStar?.N,
+			data: states.currentStar,
+			parentId: states.currentStar._id,
+			name: states.currentStar.n,
 			description: "",
-			// type: CBType.Star,
+			collection: Collection.Stars,
 			adjacent: [],
 			children: [],
-			collection: Collection.Stars,
-			// comparator: starComparator,
 		});
 	}, [states.currentStar]);
 
 	function handleNodeSubmit(e: React.FormEvent<HTMLFormElement>) {
-		if (!states.currentStar) return;
-		// const node: Node<Star> = new Node<Star>(
-		// 	props.currentStar,
-		// 	props.currentStar._id,
-		// 	"",
-		// 	"",
-		// 	CBType.Star,
-		// 	starComparator
-		// );
 		e.preventDefault();
+		if (!states.currentStar || !nodeValues) return;
 		const node: Node<Star> = new Node<Star>(
 			nodeValues.data,
 			nodeValues.parentId,
 			nodeValues.name,
 			nodeValues.description,
-			nodeValues.collection
+			Collection.Stars
 			// nodeValues.comparator
 		);
 		addNode(node);
@@ -69,6 +51,7 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 
 	function handleValueChanged(e: React.ChangeEvent<HTMLInputElement>) {
 		e.preventDefault();
+		if (!nodeValues) return;
 		// let value: string | CBType = e.target.value;
 		// if (e.target.name === "type") {
 		// 	switch (e.target.value) {
@@ -83,7 +66,6 @@ export const NodeForm = (props: CanvasOverlayProps) => {
 		// 			break;
 		// 	}
 		// }
-		// console.log(value);
 		setNodeValues({ ...nodeValues, [e.target.name]: e.target.value });
 	}
 

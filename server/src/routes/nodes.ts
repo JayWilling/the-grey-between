@@ -40,7 +40,6 @@ async function getNodeByParentId(req: Request, res: Response) {
                 parentId: new BSON.ObjectId(id)
             };
             const node = await collections.nodes.findOne(query);
-            console.log(node);
             if (!node) {
                 res.status(503).send();
             } else {
