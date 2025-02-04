@@ -5,7 +5,7 @@ import { CanvasOverlayProps } from "./HUDOverlay";
 import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
 export const CelestialBodyForm = (props: CanvasOverlayProps) => {
-	const { states, formValues } = useContext(
+	const { states, handlers, formValues } = useContext(
 		StarMapContext
 	) as IStarMapContext;
 
@@ -32,7 +32,7 @@ export const CelestialBodyForm = (props: CanvasOverlayProps) => {
 	}
 
 	function handleCancel(e: React.MouseEvent<HTMLButtonElement>) {
-		props.updateOverlayState(e, OverlayState.SolarSystem);
+		handlers.updateOverlayState(e, OverlayState.SolarSystem);
 	}
 
 	if (!formValues.celestialBodyData) return <>Loading</>;

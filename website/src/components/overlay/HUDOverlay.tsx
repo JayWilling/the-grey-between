@@ -9,12 +9,7 @@ import { SearchableDropdown } from "../SearchableDropdown/SearchableDropdown";
 import { SearchBar } from "./SearchBar/SearchBar";
 import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
-export interface CanvasOverlayProps {
-	updateOverlayState: (
-		e: React.MouseEvent<HTMLElement>,
-		state: OverlayState
-	) => void;
-}
+export interface CanvasOverlayProps {}
 
 export const StarMapOverlay = (props: CanvasOverlayProps) => {
 	// const circleIdentiferRef = useRef<HTMLDivElement>(null);

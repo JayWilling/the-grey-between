@@ -87,3 +87,8 @@
     font-size: 16px;
     margin: 20px;
 }
+
+.detailsPanel {
+    display: flex;
+    flex-direction: row;
+}

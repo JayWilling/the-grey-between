@@ -10,6 +10,7 @@ export enum OverlayState {
     SolarSystem,
     CreateCB,
     CreateNode,
+    ViewNode,
     Story,
 }
 

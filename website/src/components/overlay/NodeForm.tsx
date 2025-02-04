@@ -6,15 +6,10 @@ import { starComparator } from "../../utils";
 import { addNode } from "../../api/nodesApi";
 import { IStarMapContext, StarMapContext } from "../../pages/StarMapContext";
 
-interface INodeFormProps {
-	updateOverlayState: (
-		e: React.MouseEvent<HTMLElement>,
-		state: OverlayState
-	) => void;
-}
+interface INodeFormProps {}
 
 export const NodeForm = (props: INodeFormProps) => {
-	const { states } = useContext(StarMapContext) as IStarMapContext;
+	const { states, handlers } = useContext(StarMapContext) as IStarMapContext;
 
 	const [nodeValues, setNodeValues] = useState<INode | null>(null);
 
@@ -46,7 +41,7 @@ export const NodeForm = (props: INodeFormProps) => {
 	}
 
 	function handleCancel(e: React.MouseEvent<HTMLButtonElement>) {
-		props.updateOverlayState(e, OverlayState.StarMap);
+		handlers.updateOverlayState(e, OverlayState.StarMap);
 	}
 
 	function handleValueChanged(e: React.ChangeEvent<HTMLInputElement>) {
@@ -70,11 +65,81 @@ export const NodeForm = (props: INodeFormProps) => {
 	}
 
 	if (!states.currentStar) return <div>Loading</div>;
+
+	const CreateNodeForm = () => {
+		if (!states.currentStar) return <div>Loading</div>;
+		return (
+			<form onSubmit={(e) => handleNodeSubmit(e)}>
+				<h1>{states.currentStar.n}</h1>
+				<div className="inputField">
+					<h3>System Name</h3>
+					<input
+						onChange={(e) => handleValueChanged(e)}
+						name="name"
+					></input>
+				</div>
+				<div className="inputField">
+					<h3>Type</h3>
+					<input
+						onChange={(e) => handleValueChanged(e)}
+						name="collection"
+					></input>
+				</div>
+				<div className="inputField">
+					<h3>Description</h3>
+					<input
+						onChange={(e) => handleValueChanged(e)}
+						name="description"
+					></input>
+				</div>
+				<div className="buttonField">
+					<button type="submit">Save</button>
+					<button type="button" onClick={(e) => handleCancel(e)}>
+						Cancel
+					</button>
+				</div>
+			</form>
+		);
+	};
+
+	const NodeSummary = () => {
+		if (!states.currentNode || !states.currentStar)
+			return <div>CLASSIFIED</div>;
+		return (
+			<table>
+				<tr>
+					<td>Origin</td>
+					<td>{states.currentNode.data.n}</td>
+				</tr>
+				<tr>
+					<td>Name</td>
+					<td>{states.currentNode.name}</td>
+				</tr>
+				<tr>
+					<td>Description</td>
+					<td>{states.currentNode.description}</td>
+				</tr>
+			</table>
+		);
+	};
+
+	const FormController = () => {
+		switch (states.overlayState) {
+			case OverlayState.CreateNode:
+				return <CreateNodeForm />;
+			case OverlayState.ViewNode:
+				return <NodeSummary />;
+			default:
+				return <></>;
+		}
+	};
+
 	return (
 		<div
 			className="form"
 			style={
-				states.overlayState === OverlayState.CreateNode
+				states.overlayState === OverlayState.CreateNode ||
+				states.overlayState === OverlayState.ViewNode
 					? {
 							top: "10%",
 							left: "10%",
@@ -92,43 +157,7 @@ export const NodeForm = (props: INodeFormProps) => {
 			}
 		>
 			<div className="contextMenuAddTopic">
-				{states.overlayState === OverlayState.CreateNode ? (
-					<form onSubmit={(e) => handleNodeSubmit(e)}>
-						<h1>{states.currentStar.n}</h1>
-						<div className="inputField">
-							<h3>System Name</h3>
-							<input
-								onChange={(e) => handleValueChanged(e)}
-								name="name"
-							></input>
-						</div>
-						<div className="inputField">
-							<h3>Type</h3>
-							<input
-								onChange={(e) => handleValueChanged(e)}
-								name="collection"
-							></input>
-						</div>
-						<div className="inputField">
-							<h3>Description</h3>
-							<input
-								onChange={(e) => handleValueChanged(e)}
-								name="description"
-							></input>
-						</div>
-						<div className="buttonField">
-							<button type="submit">Save</button>
-							<button
-								type="button"
-								onClick={(e) => handleCancel(e)}
-							>
-								Cancel
-							</button>
-						</div>
-					</form>
-				) : (
-					<></>
-				)}
+				<FormController />
 			</div>
 		</div>
 	);

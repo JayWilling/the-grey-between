@@ -4,7 +4,7 @@ import { CanvasOverlayProps } from "../HUDOverlay";
 import { IStarMapContext, StarMapContext } from "../../../pages/StarMapContext";
 
 export const StarMapStarMenu = (props: CanvasOverlayProps) => {
-	const { states } = useContext(StarMapContext) as IStarMapContext;
+	const { states, handlers } = useContext(StarMapContext) as IStarMapContext;
 
 	function moveToStar(e: React.MouseEvent<HTMLDivElement>) {
 		// updateCameraPosition(
@@ -30,11 +30,29 @@ export const StarMapStarMenu = (props: CanvasOverlayProps) => {
 			<div
 				className="starMenu-item"
 				onClick={async (e) =>
-					await props.updateOverlayState(e, OverlayState.SolarSystem)
+					await handlers.updateOverlayState(
+						e,
+						OverlayState.SolarSystem
+					)
 				}
 			>
 				View system
 			</div>
+			{states.currentNode ? (
+				<div
+					className="starMenu-item"
+					onClick={async (e) =>
+						await handlers.updateOverlayState(
+							e,
+							OverlayState.ViewNode
+						)
+					}
+				>
+					View Details
+				</div>
+			) : (
+				<></>
+			)}
 		</div>
 	);
 };

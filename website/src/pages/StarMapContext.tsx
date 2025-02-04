@@ -1,8 +1,9 @@
-import { createContext, useRef, useState } from "react";
+import React, { createContext, useRef, useState } from "react";
 import { Star } from "../models/Star";
 import { Node } from "../models/UniverseGraph";
 import { CBProps, OverlayState } from "../interfaces";
 import * as THREE from "three";
+import { getNodeById } from "../api/nodesApi";
 
 export interface IStarMapContext {
 	states: {
@@ -30,6 +31,12 @@ export interface IStarMapContext {
 
 		overlayState: OverlayState;
 		setOverlayState: React.Dispatch<React.SetStateAction<OverlayState>>;
+	};
+	handlers: {
+		updateOverlayState: (
+			e: React.MouseEvent<HTMLElement>,
+			state: OverlayState
+		) => void;
 	};
 	formValues: {
 		celestialBodyData: CBProps | null;
@@ -61,6 +68,55 @@ export const StarMapProvider = (props: React.PropsWithChildren) => {
 		OverlayState.StarMap
 	);
 
+	// State Handlers
+	// updateOverlayState
+	//      Called from star menu options
+	//      Should also be used by starMap instead of setOverlayState
+	async function updateOverlayState(
+		e: React.MouseEvent<HTMLElement>,
+		state: OverlayState
+	) {
+		e.preventDefault();
+		switch (state) {
+			case OverlayState.SolarSystem:
+				if (!currentStar) return;
+
+				// Get the selected node
+				const nodePromise = await getNodeById(currentStar._id);
+				if (!nodePromise) {
+					// Open new node form
+					updateOverlayState(e, OverlayState.CreateNode);
+					return;
+				}
+				setCurrentNode(nodePromise);
+				setShowStarMap(false);
+				setOverlayState(state);
+				return;
+			case OverlayState.CreateNode:
+				setOverlayState(state);
+				return;
+			case OverlayState.StarMap:
+				setShowStarMap(true);
+				setCurrentNode(null);
+				setOverlayState(state);
+				return;
+			case OverlayState.CreateCB:
+				if (currentStar != null) {
+					setOverlayState(state);
+				} else {
+					alert("Navigate to a system to start creating.");
+				}
+				return;
+			case OverlayState.Story:
+			case OverlayState.ViewNode:
+				return;
+			default:
+				alert(
+					"Missing case for OverlayState: " + state + " in StarMap."
+				);
+		}
+	}
+
 	// Form data
 	const [celestialBodyData, setCelestialBodyData] = useState<CBProps | null>(
 		null
@@ -87,6 +143,9 @@ export const StarMapProvider = (props: React.PropsWithChildren) => {
 			setShowStarMap,
 			overlayState,
 			setOverlayState,
+		},
+		handlers: {
+			updateOverlayState,
 		},
 		formValues: {
 			celestialBodyData,

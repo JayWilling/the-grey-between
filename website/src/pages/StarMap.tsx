@@ -84,7 +84,7 @@ type HtmlElementInterface =
 export const StarMap = (props: StarMapProps) => {
 	const { gl, scene, raycaster, camera } = useThree();
 
-	const { states, formValues, refs } = useContext(
+	const { states, handlers, formValues, refs } = useContext(
 		StarMapContext
 	) as IStarMapContext;
 
@@ -142,7 +142,7 @@ export const StarMap = (props: StarMapProps) => {
 		}
 	});
 
-	function onStarClick(e: ThreeEvent<MouseEvent>): void {
+	const onStarClick = async (e: ThreeEvent<MouseEvent>): Promise<void> => {
 		// Check if we clicked a point or a star mesh
 		// If we clicked a point
 		//      Check if selectedIndex matches highlightIndex
@@ -168,6 +168,7 @@ export const StarMap = (props: StarMapProps) => {
 
 		// Update the selected star
 
+		// TODO: Change how the solar system entry works. We should not have double-clicking on the stars anymore
 		if (highlightIndex === selectedIndex) {
 			// Self explanatory...
 			states.setShowStarMap(false);
@@ -180,6 +181,15 @@ export const StarMap = (props: StarMapProps) => {
 		states.setSelectedStar(newStar);
 		setSelectedIndex(highlightIndex);
 
+		// Update the current node to match
+		// Get the selected node
+		const nodePromise = await getNodeById(newStar._id);
+		if (!nodePromise) {
+			states.setCurrentNode(null);
+		} else {
+			states.setCurrentNode(nodePromise);
+		}
+
 		// Get nearest neighbours and show trade routes
 		// const lineDestinations = testStars.getNearestNeighbours(
 		// 	highlightIndex,
@@ -189,7 +199,7 @@ export const StarMap = (props: StarMapProps) => {
 		// if (lineDestinations) {
 		// 	tradeDestinations.push(...lineDestinations);
 		// }
-	}
+	};
 
 	function moveCameraToStar(target: THREE.Vector3, zoom: boolean): void {
 		updateCameraPosition(
@@ -379,57 +389,6 @@ export const StarMapCanvas = () => {
 			1;
 	}
 
-	// updateOverlayState
-	//      Called from star menu options
-	//      Should also be used by starMap instead of setOverlayState
-	async function updateOverlayState(
-		e: React.MouseEvent<HTMLElement>,
-		state: OverlayState
-	) {
-		e.preventDefault();
-		switch (state) {
-			case OverlayState.SolarSystem:
-				if (!states.currentStar) return;
-
-				// Only fetch a node if none is currently selected
-				if (!states.currentNode) {
-					// Get the selected node
-					const nodePromise = await getNodeById(
-						states.currentStar._id
-					);
-					if (!nodePromise) {
-						// Open new node form
-						updateOverlayState(e, OverlayState.CreateNode);
-						return;
-					}
-					states.setCurrentNode(nodePromise);
-				}
-				states.setShowStarMap(false);
-				states.setOverlayState(state);
-				return;
-			case OverlayState.CreateNode:
-				states.setOverlayState(state);
-				return;
-			case OverlayState.StarMap:
-				states.setShowStarMap(true);
-				states.setCurrentNode(null);
-				states.setOverlayState(state);
-				return;
-			case OverlayState.CreateCB:
-				if (states.currentStar != null) {
-					states.setOverlayState(state);
-				} else {
-					alert("Navigate to a system to start creating.");
-				}
-				return;
-			case OverlayState.Story:
-			default:
-				alert(
-					"Missing case for OverlayState: " + state + " in StarMap."
-				);
-		}
-	}
-
 	if (loading !== LoadState.Loaded) {
 		return (
 			<Loader
@@ -444,7 +403,7 @@ export const StarMapCanvas = () => {
 
 	return (
 		<div className="starmapContainer">
-			<StarMapOverlay updateOverlayState={updateOverlayState} />
+			<StarMapOverlay />
 			<Canvas
 				onMouseMove={(e) => {
 					onMouseMoveEvent(e);
